@@ -1,0 +1,2295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LuxxPay - Premium Fintech</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dark: '#050505', card: '#111111', cardLight: '#1a1a1a',
+                        borderDark: '#2a2a2a', neonYellow: '#FFD700', neonCyan: '#00E5FF',
+                        neonGreen: '#00E676', neonRed: '#FF3D00',
+                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'], display: ['Rajdhani', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #000000; color: #ffffff; -webkit-tap-highlight-color: transparent; }
+        .app-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background-color: #050505; position: relative; padding-bottom: 90px; overflow-x: hidden; box-shadow: 0 0 20px rgba(0,0,0,0.8); }
+        ::-webkit-scrollbar { display: none; }
+        .glow-yellow { box-shadow: 0 0 15px rgba(255, 215, 0, 0.3); }
+        .glow-cyan { box-shadow: 0 0 15px rgba(0, 229, 255, 0.3); }
+        .glow-green { box-shadow: 0 0 15px rgba(0, 230, 118, 0.3); }
+        .page-view { display: none; animation: fadeIn 0.3s ease-in-out; }
+        .page-view.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .custom-input { background-color: #1a1a1a; border: 1px solid #2a2a2a; color: #fff; border-radius: 12px; padding: 14px 16px 14px 44px; width: 100%; outline: none; transition: all 0.3s; }
+        .custom-input:focus { border-color: #FFD700; box-shadow: 0 0 10px rgba(255, 215, 0, 0.2); }
+        .custom-input::placeholder { color: #555; }
+        .custom-input.error { border-color: #FF3D00 !important; box-shadow: 0 0 8px rgba(255, 61, 0, 0.4); }
+        .custom-input.success { border-color: #00E676 !important; box-shadow: 0 0 8px rgba(0, 230, 118, 0.3); }
+        .portfolio-chart { background: linear-gradient(180deg, rgba(255,215,0,0.2) 0%, rgba(255,215,0,0) 100%); border-bottom: 3px solid #FFD700; clip-path: polygon(0 80%, 20% 60%, 40% 70%, 60% 30%, 80% 40%, 100% 0, 100% 100%, 0 100%); height: 120px; width: 100%; }
+        .error-text { color: #FF3D00; font-size: 11px; margin-top: 4px; display: none; font-weight: 500; }
+        .error-text.show { display: block; }
+        .filter-btn { padding: 8px 20px; border-radius: 9999px; background-color: #111111; border: 1px solid #2a2a2a; color: #9ca3af; font-size: 14px; white-space: nowrap; cursor: pointer; transition: all 0.2s; }
+        .filter-btn.active { background-color: #FFD700; color: #000; font-weight: bold; border-color: #FFD700; }
+        #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; width: 90%; max-width: 440px; pointer-events: none; }
+        .toast { padding: 14px 18px; border-radius: 12px; margin-bottom: 10px; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 10px; animation: toastIn 0.3s ease-out; box-shadow: 0 4px 20px rgba(0,0,0,0.5); border: 1px solid; }
+        .toast.success { background: #0a2a1a; border-color: #00E676; color: #00E676; }
+        .toast.error { background: #2a0a0a; border-color: #FF3D00; color: #FF3D00; }
+        .toast.info { background: #1a1a05; border-color: #FFD700; color: #FFD700; }
+        @keyframes toastIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        .timer-warning { animation: pulse 1s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .payout-card { transition: all 0.3s; }
+        .payout-card.active { border-color: #FFD700 !important; background: rgba(255, 215, 0, 0.05); }
+        .payout-card.active .payout-radio { border-color: #FFD700; }
+        .payout-card.active .payout-radio-inner { display: block; }
+        .payout-radio { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #666; display: flex; align-items: center; justify-content: center; }
+        .payout-radio-inner { width: 10px; height: 10px; border-radius: 50%; background: #FFD700; display: none; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+        .live-tx-item { animation: slideIn 0.4s ease-out; }
+        @keyframes pulse-dot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.5); } }
+        .live-dot { animation: pulse-dot 1.5s infinite; }
+        @keyframes countUp { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+        .count-anim { animation: countUp 0.3s ease-out; }
+    </style>
+</head>
+<body>
+
+<div id="toast-container"></div>
+
+<div class="app-container">
+    
+    <header class="flex justify-between items-center p-5 border-b border-borderDark bg-dark sticky top-0 z-50">
+        <h1 class="text-2xl font-bold font-display tracking-wider">LuxxPay</h1>
+        <div class="w-10 h-10 rounded-lg bg-card border border-borderDark flex items-center justify-center">
+            <span class="text-neonYellow font-bold text-xs">LP</span>
+        </div>
+    </header>
+
+    <!-- ================= PAGE 1: AUTH ================= -->
+    <div id="page-auth" class="page-view active p-5">
+        <div class="text-center mt-6 mb-8">
+            <div class="w-20 h-20 mx-auto bg-cardLight border border-neonYellow rounded-2xl flex items-center justify-center glow-yellow mb-4">
+                <i class="fa-solid fa-bolt text-neonYellow text-4xl"></i>
+            </div>
+            <h2 class="text-4xl font-bold font-display tracking-widest text-white mb-2">LUXXPAY</h2>
+            <p class="text-gray-400 text-sm tracking-widest mb-1">PREMIUM FINTECH PLATFORM</p>
+            <p class="text-gray-600 text-xs mb-3">高级金融科技平台</p>
+            <div class="flex items-center justify-center gap-2 text-neonGreen text-sm font-semibold mb-1">
+                <span class="w-2 h-2 rounded-full bg-neonGreen animate-pulse"></span> LIVE SESSION 2026
+            </div>
+            <p class="text-neonGreen text-xs">实时会话 2026</p>
+        </div>
+
+        <div class="flex bg-card rounded-full p-1 border border-borderDark mb-6 relative">
+            <button type="button" onclick="toggleAuth('signin')" id="btn-signin" class="flex-1 py-3 rounded-full text-sm font-bold transition-all text-gray-400">SIGN IN</button>
+            <button type="button" onclick="toggleAuth('register')" id="btn-register" class="flex-1 py-3 rounded-full text-sm font-bold transition-all bg-neonYellow text-black glow-yellow">REGISTER</button>
+        </div>
+
+        <div id="form-register" class="space-y-4">
+            <div>
+                <label class="text-gray-400 text-xs block mb-1">FULL NAME *</label>
+                <div class="relative">
+                    <i class="fa-regular fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                    <input type="text" id="reg-fullname" placeholder="Your full name" class="custom-input">
+                </div>
+                <p class="error-text" id="err-reg-fullname">Please enter your full name</p>
+            </div>
+            <div>
+                <label class="text-gray-400 text-xs block mb-1">EMAIL ADDRESS *</label>
+                <div class="relative">
+                    <i class="fa-regular fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                    <input type="email" id="reg-email" placeholder="your@email.com" class="custom-input">
+                </div>
+                <p class="error-text" id="err-reg-email">Please enter a valid email</p>
+            </div>
+            <div>
+                <label class="text-gray-400 text-xs block mb-1">MOBILE NUMBER *</label>
+                <div class="relative">
+                    <i class="fa-solid fa-phone absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                    <input type="tel" id="reg-mobile" placeholder="10-digit mobile" class="custom-input" maxlength="10" inputmode="numeric">
+                </div>
+                <p class="error-text" id="err-reg-mobile">Mobile must be exactly 10 digits</p>
+            </div>
+            <div>
+                <label class="text-gray-400 text-xs block mb-1">USERNAME *</label>
+                <div class="relative">
+                    <i class="fa-regular fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                    <input type="text" id="reg-username" placeholder="Choose a username" class="custom-input">
+                </div>
+                <p class="error-text" id="err-reg-username">Username must be at least 3 characters</p>
+            </div>
+            <div>
+                <label class="text-gray-400 text-xs block mb-1">PASSWORD *</label>
+                <div class="relative">
+                    <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                    <input type="password" id="reg-password" placeholder="Min 6 characters" class="custom-input">
+                    <i class="fa-regular fa-eye absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 cursor-pointer" onclick="togglePassword('reg-password', this)"></i>
+                </div>
+                <p class="error-text" id="err-reg-password">Password must be at least 6 characters</p>
+            </div>
+            <button type="button" onclick="handleRegister()" class="w-full bg-neonYellow text-black font-bold py-4 rounded-xl mt-4 glow-yellow">
+                CREATE ACCOUNT
+            </button>
+        </div>
+
+        <div id="form-signin" class="space-y-4 hidden">
+            <div>
+                <label class="text-gray-400 text-xs block mb-1">USER ID OR EMAIL *</label>
+                <div class="relative">
+                    <i class="fa-regular fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                    <input type="text" id="login-userid" placeholder="Enter User ID or email" class="custom-input">
+                </div>
+                <p class="error-text" id="err-login-userid">Please enter your User ID or Email</p>
+            </div>
+            <div>
+                <label class="text-gray-400 text-xs block mb-1">PASSWORD *</label>
+                <div class="relative">
+                    <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                    <input type="password" id="login-password" placeholder="Enter your password" class="custom-input">
+                    <i class="fa-regular fa-eye absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 cursor-pointer" onclick="togglePassword('login-password', this)"></i>
+                </div>
+                <p class="error-text" id="err-login-password">Please enter your password</p>
+            </div>
+            <button type="button" onclick="handleLogin()" class="w-full bg-neonYellow text-black font-bold py-4 rounded-xl mt-4 glow-yellow">
+                SIGN IN
+            </button>
+            <p class="text-center text-gray-400 text-sm mt-4">Don't have an account? <span class="text-neonYellow font-bold cursor-pointer" onclick="toggleAuth('register')">Register here</span></p>
+        </div>
+    </div>
+
+    <!-- ================= PAGE 2: HOME ================= -->
+    <div id="page-home" class="page-view p-5">
+        <div class="flex justify-between items-start mb-6">
+            <div>
+                <p class="text-gray-400 text-sm">WELCOME BACK</p>
+                <p class="text-neonYellow text-sm font-bold mt-1">LUXXPAY</p>
+                <h2 class="text-4xl font-bold font-display tracking-widest mt-1" id="home-display-name">USER</h2>
+            </div>
+            <div class="text-right">
+                <div class="flex items-center gap-2 text-neonGreen text-sm font-semibold mb-1">
+                    <span class="w-2 h-2 rounded-full bg-neonGreen animate-pulse"></span> LIVE
+                </div>
+                <p class="text-neonYellow text-lg font-mono" id="live-clock">00:00:00</p>
+            </div>
+        </div>
+
+        <div class="flex gap-4 overflow-x-auto pb-4 mb-4" style="scroll-snap-type: x mandatory;">
+            <div class="min-w-[280px] bg-card border border-neonYellow rounded-2xl p-5 glow-yellow">
+                <p class="text-gray-400 text-sm tracking-wider">GAMING FUND WALLET</p>
+                <div class="flex items-center gap-2 mt-4">
+                    <span class="text-2xl font-bold text-white">₹</span>
+                    <span class="text-4xl font-bold font-display" id="home-gaming-wallet">0</span>
+                </div>
+            </div>
+            <div class="min-w-[280px] bg-card border border-neonCyan rounded-2xl p-5">
+                <p class="text-gray-400 text-sm tracking-wider">STOCK FUND WALLET</p>
+                <div class="flex items-center gap-2 mt-4">
+                    <span class="text-2xl font-bold text-white">$</span>
+                    <span class="text-4xl font-bold font-display">0</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-4 mb-6">
+            <button onclick="showPage('page-plans')" class="flex flex-col items-center gap-2 group">
+                <div class="w-16 h-16 rounded-full border border-neonYellow flex items-center justify-center group-hover:bg-neonYellow/10 transition-all">
+                    <i class="fa-solid fa-arrow-down text-neonYellow text-xl"></i>
+                </div>
+                <span class="text-xs font-bold">DEPOSIT</span>
+            </button>
+            <button onclick="showPage('page-withdraw')" class="flex flex-col items-center gap-2 group">
+                <div class="w-16 h-16 rounded-full border border-neonCyan flex items-center justify-center group-hover:bg-neonCyan/10 transition-all">
+                    <i class="fa-solid fa-arrow-up text-neonCyan text-xl"></i>
+                </div>
+                <span class="text-xs font-bold">WITHDRAW</span>
+            </button>
+            <button onclick="showPage('page-history')" class="flex flex-col items-center gap-2 group">
+                <div class="w-16 h-16 rounded-full border border-gray-600 flex items-center justify-center group-hover:bg-gray-800 transition-all">
+                    <i class="fa-solid fa-list-ul text-white text-xl"></i>
+                </div>
+                <span class="text-xs font-bold">HISTORY</span>
+            </button>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <div class="bg-card border border-neonGreen rounded-2xl p-4">
+                <p class="text-gray-400 text-xs">TOTAL CREDIT</p>
+                <p class="text-neonGreen text-2xl font-bold font-display mt-2" id="home-total-credit">₹0</p>
+            </div>
+            <div class="bg-card border border-neonRed rounded-2xl p-4">
+                <p class="text-gray-400 text-xs">TOTAL DEBIT</p>
+                <p class="text-neonRed text-2xl font-bold font-display mt-2" id="home-total-debit">₹0</p>
+            </div>
+        </div>
+
+        <div class="bg-card border border-neonCyan rounded-2xl p-4 mb-6">
+            <p class="text-gray-400 text-xs">TOTAL COMMISSION</p>
+            <p class="text-neonCyan text-2xl font-bold font-display mt-2" id="home-total-commission">₹0</p>
+        </div>
+
+        <!-- ACTIVE ACCOUNTS SECTION -->
+        <div class="mb-6" id="home-active-accounts-section" style="display: none;">
+            <p class="text-gray-400 text-sm tracking-wider mb-1">ACTIVE ACCOUNTS</p>
+            <p class="text-gray-600 text-[10px] mb-3">活跃账户</p>
+            <div id="home-active-accounts-list"></div>
+        </div>
+
+        <div class="mb-6">
+            <p class="text-gray-400 text-sm tracking-wider mb-1">PORTFOLIO PERFORMANCE</p>
+            <div class="bg-card border border-borderDark rounded-2xl p-4 overflow-hidden">
+                <div class="portfolio-chart"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= PAGE 3: SELECT PLAN ================= -->
+    <div id="page-plans" class="page-view p-5">
+        <div class="mb-6">
+            <p class="text-neonYellow text-sm tracking-widest">LUXXPAY</p>
+            <h2 class="text-3xl font-bold font-display mt-1">Security Deposit</h2>
+            <p class="text-gray-500 text-sm">安全保证金</p>
+        </div>
+
+        <div class="flex items-center gap-2 mb-3">
+            <div class="w-6 h-6 rounded-full bg-neonYellow text-black text-xs font-bold flex items-center justify-center">1</div>
+            <p class="text-gray-400 text-sm tracking-widest">SELECT FUND TYPE</p>
+        </div>
+        <p class="text-gray-600 text-[10px] mb-3 ml-8">选择基金类型</p>
+        
+        <div class="grid grid-cols-2 gap-4 mb-6" id="plans-fund-cards">
+            <div id="plan-fund-gaming" onclick="selectPlanFund('gaming')" class="plan-fund-card bg-card border border-borderDark rounded-2xl p-4 cursor-pointer">
+                <i class="fa-solid fa-gamepad text-gray-400 text-2xl mb-3"></i>
+                <p class="font-bold text-sm text-white">Gaming Fund</p>
+                <p class="text-gray-500 text-xs mb-2">游戏基金</p>
+                <p class="text-gray-500 text-xs plan-fund-comm">Commission: 5%</p>
+            </div>
+            <div id="plan-fund-stock" onclick="selectPlanFund('stock')" class="plan-fund-card bg-card border border-borderDark rounded-2xl p-4 cursor-pointer">
+                <i class="fa-solid fa-chart-line text-gray-400 text-2xl mb-3"></i>
+                <p class="font-bold text-sm text-white">Stock Fund</p>
+                <p class="text-gray-500 text-xs mb-2">股票基金</p>
+                <p class="text-gray-500 text-xs plan-fund-comm">Commission: 10%</p>
+            </div>
+        </div>
+
+        <div id="plans-instruction" class="border-2 border-dashed border-borderDark rounded-2xl p-6 text-center mb-6">
+            <i class="fa-solid fa-arrow-up text-gray-600 text-2xl mb-2"></i>
+            <p class="text-gray-400 text-sm">Select fund type above to start deposit</p>
+            <p class="text-gray-600 text-[10px] mt-1">请先在上方选择基金类型以开始付款</p>
+        </div>
+
+        <div id="plans-account-section" style="display: none;">
+            <div class="flex items-center gap-2 mb-3">
+                <div class="w-6 h-6 rounded-full bg-neonYellow text-black text-xs font-bold flex items-center justify-center">2</div>
+                <p class="text-gray-400 text-sm tracking-widest">SELECT ACCOUNT TYPE</p>
+            </div>
+            <p class="text-gray-600 text-[10px] mb-3 ml-8">选择账户类型</p>
+            
+            <div class="space-y-3 mb-4">
+                <div id="plan-acc-saving" onclick="selectPlanAccount('saving', 5000, 'Saving Account')" class="plan-acc-card bg-card border border-neonYellow rounded-2xl p-4 flex justify-between items-center cursor-pointer">
+                    <div>
+                        <p class="font-bold text-neonYellow">Saving Account</p>
+                        <p class="text-gray-500 text-xs">储蓄账户</p>
+                        <p class="text-gray-600 text-[10px] mt-1">Refundable on account closure</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-bold text-neonYellow text-lg plan-acc-price">₹5,000</p>
+                        <p class="text-gray-600 text-[10px]">INR Only</p>
+                    </div>
+                </div>
+                <div id="plan-acc-current" onclick="selectPlanAccount('current', 10000, 'Current Account')" class="plan-acc-card bg-card border border-borderDark rounded-2xl p-4 flex justify-between items-center cursor-pointer opacity-60">
+                    <div>
+                        <p class="font-bold text-white">Current Account</p>
+                        <p class="text-gray-500 text-xs">活期账户</p>
+                        <p class="text-gray-600 text-[10px] mt-1">Refundable on account closure</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-bold text-white text-lg plan-acc-price">₹10,000</p>
+                        <p class="text-gray-600 text-[10px]">INR Only</p>
+                    </div>
+                </div>
+                <div id="plan-acc-corporate" onclick="selectPlanAccount('corporate', 15000, 'Corporate Account')" class="plan-acc-card bg-card border border-borderDark rounded-2xl p-4 flex justify-between items-center cursor-pointer opacity-60">
+                    <div>
+                        <p class="font-bold text-white">Corporate Account</p>
+                        <p class="text-gray-500 text-xs">企业账户</p>
+                        <p class="text-gray-600 text-[10px] mt-1">Refundable on account closure</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-bold text-white text-lg plan-acc-price">₹15,000</p>
+                        <p class="text-gray-600 text-[10px]">INR Only</p>
+                    </div>
+                </div>
+            </div>
+
+            <button id="plan-proceed-btn" onclick="proceedToPayment()" class="w-full bg-neonYellow text-black font-bold py-4 rounded-xl glow-yellow mt-4 mb-6">
+                PROCEED TO PAYMENT <br><span class="text-xs font-normal">前往付款</span>
+            </button>
+        </div>
+
+        <button onclick="showPage('page-home')" class="w-full bg-card border border-borderDark text-gray-400 font-bold py-4 rounded-xl">
+            BACK TO HOME
+        </button>
+    </div>
+
+    <!-- ================= PAGE 4: DEPOSIT ================= -->
+    <div id="page-deposit" class="page-view p-5">
+        <div class="mb-6 flex justify-between items-start">
+            <div>
+                <p class="text-gray-400 text-sm tracking-widest">LUXXPAY</p>
+                <h2 class="text-3xl font-bold font-display mt-1">Payment Gateway</h2>
+                <p class="text-gray-500 text-sm">支付网关</p>
+            </div>
+            <div class="bg-neonYellow/10 border border-neonYellow rounded-lg px-3 py-1.5 flex items-center gap-2">
+                <i class="fa-regular fa-clock text-neonYellow"></i>
+                <span class="text-neonYellow font-bold font-mono text-lg" id="deposit-timer">03:00</span>
+            </div>
+        </div>
+
+        <div class="bg-card border border-borderDark rounded-2xl p-6 text-center mb-6">
+            <p class="text-gray-400 text-sm tracking-widest mb-1">SCAN QR</p>
+            <div class="w-48 h-48 mx-auto bg-white rounded-xl p-2 flex items-center justify-center mb-4">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=Deewuuu01@ptyes&pn=LuxxPay" alt="QR Code" class="w-full h-full object-contain rounded-lg">
+            </div>
+            <p class="text-gray-400 text-xs">Scan with any UPI app</p>
+        </div>
+
+        <div class="bg-card border border-borderDark rounded-2xl p-4 mb-6">
+            <p class="text-gray-400 text-xs tracking-widest mb-1">UPI ID</p>
+            <div class="flex items-center gap-3 mt-2">
+                <div class="flex-1 bg-dark border border-borderDark rounded-xl p-3 flex items-center justify-between">
+                    <span class="text-neonCyan font-mono text-sm truncate">Deewuuu01@ptyes</span>
+                    <button onclick="copyUPI()" class="bg-neonYellow/20 text-neonYellow px-3 py-1 rounded-lg text-xs font-bold">
+                        <i class="fa-regular fa-copy"></i> Copy
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-card border border-neonYellow rounded-2xl p-4 text-center mb-6">
+            <p class="text-gray-400 text-xs tracking-widest mb-1">PAY EXACT:</p>
+            <p class="text-3xl font-bold text-neonYellow" id="deposit-amount-display">₹5,000</p>
+        </div>
+
+        <p class="text-gray-400 text-xs tracking-widest mb-1">ENTER UTR NUMBER</p>
+        <p class="text-gray-600 text-[10px] mb-3">输入 UTR 编号</p>
+        <div class="relative mb-2">
+            <i class="fa-solid fa-receipt absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+            <input type="text" id="deposit-utr" placeholder="Enter UTR number" class="custom-input">
+        </div>
+        <p class="text-gray-500 text-[10px] mb-6">Find UTR in your UPI app's payment history</p>
+
+        <button onclick="submitDeposit()" class="w-full bg-neonYellow text-black font-bold py-4 rounded-xl glow-yellow mb-3">
+            SUBMIT INR
+        </button>
+
+        <button onclick="cancelDeposit()" class="w-full bg-card border border-neonRed text-neonRed font-bold py-4 rounded-xl mb-6">
+            CANCEL & BACK
+        </button>
+    </div>
+
+    <!-- ================= PAGE 4B: LIVE TRANSACTION ================= -->
+    <div id="page-live-tx" class="page-view p-5">
+        <div class="mb-6 flex justify-between items-start">
+            <div>
+                <p class="text-gray-400 text-sm tracking-widest">LUXXPAY</p>
+                <h2 class="text-3xl font-bold font-display mt-1">Live Transaction</h2>
+                <p class="text-gray-500 text-sm">实时交易</p>
+            </div>
+            <div class="flex items-center gap-2 bg-gray-800 border border-gray-600 rounded-lg px-3 py-1.5" id="live-status-badge">
+                <span class="w-2 h-2 rounded-full bg-gray-500" id="live-dot"></span>
+                <span class="text-gray-400 font-bold text-sm" id="live-status-text">INACTIVE</span>
+            </div>
+        </div>
+
+        <!-- PAUSE / RESUME BUTTONS -->
+        <div class="grid grid-cols-2 gap-3 mb-6">
+            <button onclick="toggleLivePause()" id="btn-pause-live" class="bg-neonYellow/20 border border-neonYellow text-neonYellow font-bold py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-neonYellow/30 transition-all">
+                <i class="fa-solid fa-pause" id="pause-icon"></i> <span id="pause-text">PAUSE</span>
+            </button>
+            <button onclick="stopLiveFeed()" class="bg-neonRed/20 border border-neonRed text-neonRed font-bold py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-neonRed/30 transition-all">
+                <i class="fa-solid fa-stop"></i> STOP
+            </button>
+        </div>
+
+        <div id="live-session-banner" class="bg-neonGreen/10 border border-neonGreen rounded-2xl p-4 mb-6" style="display: none;">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-neonGreen/20 flex items-center justify-center">
+                    <i class="fa-solid fa-bolt text-neonGreen"></i>
+                </div>
+                <div class="flex-1">
+                    <p class="text-neonGreen font-bold text-sm" id="live-banner-fund">Gaming Fund · Saving Account</p>
+                    <p class="text-gray-400 text-xs" id="live-banner-rate">5% Commission</p>
+                </div>
+                <i class="fa-solid fa-circle-check text-neonGreen text-xl"></i>
+            </div>
+        </div>
+
+        <div class="bg-gradient-to-br from-neonYellow/10 to-neonYellow/5 border border-neonYellow rounded-2xl p-5 mb-6 glow-yellow">
+            <p class="text-gray-400 text-xs tracking-widest mb-1">SESSION STATUS</p>
+            <p class="text-gray-600 text-[10px] mb-3">会话状态</p>
+            <div class="flex justify-between items-center">
+                <div>
+                    <p class="text-gray-400 text-xs">Total Transactions</p>
+                    <p class="text-3xl font-bold text-neonYellow" id="live-tx-count">0</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-gray-400 text-xs">Commission Rate</p>
+                    <p class="text-2xl font-bold text-neonGreen" id="live-commission-rate">@5%</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <div class="bg-card border border-neonGreen rounded-2xl p-4">
+                <p class="text-gray-400 text-xs">TOTAL CREDIT</p>
+                <p class="text-neonGreen text-2xl font-bold font-display mt-2 count-anim" id="live-total-credit">₹0</p>
+            </div>
+            <div class="bg-card border border-neonRed rounded-2xl p-4">
+                <p class="text-gray-400 text-xs">TOTAL DEBIT</p>
+                <p class="text-neonRed text-2xl font-bold font-display mt-2" id="live-total-debit">₹0</p>
+            </div>
+        </div>
+
+        <div class="bg-card border border-neonCyan rounded-2xl p-4 mb-6">
+            <p class="text-gray-400 text-xs">TOTAL COMMISSION</p>
+            <p class="text-neonCyan text-2xl font-bold font-display mt-2 count-anim" id="live-total-commission">₹0</p>
+        </div>
+
+        <p class="text-gray-400 text-xs tracking-widest mb-1">LIVE FEED</p>
+        <p class="text-gray-600 text-[10px] mb-3">实时动态</p>
+        
+        <div class="space-y-3 mb-6 max-h-[400px] overflow-y-auto" id="live-feed">
+            <div class="border-2 border-dashed border-borderDark rounded-2xl p-6 text-center" id="live-feed-empty">
+                <i class="fa-solid fa-bolt text-gray-600 text-3xl mb-2"></i>
+                <p class="text-gray-500 text-xs">Waiting for activity...</p>
+            </div>
+        </div>
+
+        <button onclick="showPage('page-home')" class="w-full bg-card border border-borderDark text-gray-400 font-bold py-4 rounded-xl mb-3">
+            ← BACK TO HOME (Session continues in background)
+        </button>
+    </div>
+
+    <!-- ================= PAGE 5: ADD ACCOUNT ================= -->
+    <div id="page-add-acc" class="page-view p-5">
+        <div class="mb-6">
+            <p class="text-neonYellow text-sm tracking-widest">LUXXPAY</p>
+            <h2 class="text-3xl font-bold font-display mt-1">Add New Account</h2>
+            <p class="text-gray-500 text-sm">添加新账户</p>
+        </div>
+
+        <div class="bg-card border border-neonYellow rounded-2xl p-4 mb-6">
+            <div class="flex items-start gap-3">
+                <div class="w-10 h-10 rounded-lg bg-neonYellow/10 flex items-center justify-center flex-shrink-0">
+                    <i class="fa-solid fa-shield-halved text-neonYellow"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-sm text-neonYellow">Secure Account</h3>
+                    <p class="text-gray-400 text-xs leading-relaxed mt-1">Fill details and submit to proceed to payment.</p>
+                </div>
+            </div>
+        </div>
+
+        <p class="text-gray-400 text-sm mb-1">SELECT FUND TYPE</p>
+        <div class="grid grid-cols-2 gap-4 mb-6 mt-2">
+            <div id="fund-gaming" onclick="selectFund('gaming')" class="fund-card bg-card border border-neonGreen rounded-2xl p-4 cursor-pointer">
+                <i class="fa-solid fa-gamepad text-neonGreen text-2xl mb-3"></i>
+                <p class="font-bold text-sm text-white">Gaming Fund</p>
+                <p class="text-neonGreen text-xs mt-2">Commission: 5%</p>
+            </div>
+            <div id="fund-stock" onclick="selectFund('stock')" class="fund-card bg-card border border-borderDark rounded-2xl p-4 cursor-pointer opacity-60">
+                <i class="fa-solid fa-chart-line text-gray-400 text-2xl mb-3"></i>
+                <p class="font-bold text-sm text-white">Stock Fund</p>
+                <p class="text-gray-500 text-xs mt-2">Commission: 10%</p>
+            </div>
+        </div>
+
+        <p class="text-gray-400 text-sm mb-3">SELECT ACCOUNT TYPE</p>
+        <div class="space-y-3 mb-6">
+            <div id="acc-saving" onclick="selectAccType('saving', 5000, 'Saving Account')" class="acc-type-card bg-card border border-neonYellow rounded-2xl p-4 flex justify-between items-center cursor-pointer">
+                <div><p class="font-bold text-neonYellow">Saving Account</p><p class="text-gray-500 text-xs">储蓄账户</p></div>
+                <p class="font-bold text-neonYellow text-lg acc-price">₹5,000</p>
+            </div>
+            <div id="acc-current" onclick="selectAccType('current', 10000, 'Current Account')" class="acc-type-card bg-card border border-borderDark rounded-2xl p-4 flex justify-between items-center cursor-pointer opacity-60">
+                <div><p class="font-bold text-white">Current Account</p><p class="text-gray-500 text-xs">活期账户</p></div>
+                <p class="font-bold text-white text-lg acc-price">₹10,000</p>
+            </div>
+            <div id="acc-corporate" onclick="selectAccType('corporate', 15000, 'Corporate Account')" class="acc-type-card bg-card border border-borderDark rounded-2xl p-4 flex justify-between items-center cursor-pointer opacity-60">
+                <div><p class="font-bold text-white">Corporate Account</p><p class="text-gray-500 text-xs">企业账户</p></div>
+                <p class="font-bold text-white text-lg acc-price">₹15,000</p>
+            </div>
+        </div>
+
+        <div class="bg-neonYellow/10 border border-neonYellow rounded-2xl p-4 mb-6">
+            <p class="font-bold text-neonYellow text-sm text-center">SECURITY DEPOSIT: ₹<span id="deposit-required">5,000</span></p>
+            <p class="text-gray-400 text-xs text-center mt-1">Refundable on account closure</p>
+        </div>
+
+        <p class="text-gray-400 text-sm mb-3">BANK ACCOUNT DETAILS</p>
+        <div class="space-y-4 mb-6">
+            <div><label class="text-gray-400 text-xs block mb-1">ACCOUNT HOLDER NAME *</label><input type="text" id="acc-holder" placeholder="Full name" class="custom-input"></div>
+            <div><label class="text-gray-400 text-xs block mb-1">BANK NAME *</label><input type="text" id="acc-bank" placeholder="e.g. HDFC Bank" class="custom-input"></div>
+            <div><label class="text-gray-400 text-xs block mb-1">ACCOUNT NUMBER *</label><input type="text" id="acc-number" placeholder="Enter account number" class="custom-input"></div>
+            <div><label class="text-gray-400 text-xs block mb-1">IFSC CODE *</label><input type="text" id="acc-ifsc" placeholder="e.g. HDFC0001234" class="custom-input"></div>
+            <div><label class="text-gray-400 text-xs block mb-1">MOBILE NUMBER *</label><input type="tel" id="acc-mobile" placeholder="10-digit mobile" class="custom-input" maxlength="10" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)"></div>
+            <div><label class="text-gray-400 text-xs block mb-1">EMAIL ADDRESS *</label><input type="email" id="acc-email" placeholder="your@email.com" class="custom-input"></div>
+        </div>
+
+        <button onclick="submitAccountDetails()" class="w-full bg-neonYellow text-black font-bold py-4 rounded-xl glow-yellow mb-6">
+            SUBMIT & PROCEED TO PAYMENT
+        </button>
+    </div>
+
+    <!-- ================= PAGE 5B: ACCOUNT PAYMENT ================= -->
+    <div id="page-acc-payment" class="page-view p-5">
+        <div class="mb-6 flex justify-between items-start">
+            <div>
+                <p class="text-gray-400 text-sm tracking-widest">LUXXPAY</p>
+                <h2 class="text-3xl font-bold font-display mt-1">Complete Payment</h2>
+                <p class="text-gray-500 text-sm">完成付款以激活您的账户</p>
+            </div>
+            <div class="bg-neonYellow/10 border border-neonYellow rounded-lg px-3 py-1.5 flex items-center gap-2">
+                <i class="fa-regular fa-clock text-neonYellow"></i>
+                <span class="text-neonYellow font-bold font-mono text-lg" id="acc-timer">03:00</span>
+            </div>
+        </div>
+
+        <div class="bg-card border border-neonGreen rounded-2xl p-5 mb-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-neonGreen/10 flex items-center justify-center">
+                        <i class="fa-solid fa-gamepad text-neonGreen"></i>
+                    </div>
+                    <div>
+                        <p class="font-bold text-sm text-white"><span id="summary-fund">Gaming Fund</span> — <span id="summary-acc">Saving Account</span></p>
+                        <p class="text-gray-500 text-xs">Security Deposit — Refundable</p>
+                    </div>
+                </div>
+                <i class="fa-solid fa-circle-check text-neonGreen text-2xl"></i>
+            </div>
+        </div>
+
+        <div class="bg-neonYellow/5 border border-neonYellow rounded-2xl p-6 text-center mb-6">
+            <p class="text-gray-400 text-sm tracking-widest mb-1">AMOUNT TO PAY (INR)</p>
+            <p class="text-4xl font-bold text-neonYellow">₹<span id="summary-amount">5,000</span></p>
+            <p class="text-gray-400 text-xs mt-3">Refundable Security Deposit</p>
+        </div>
+
+        <div class="bg-card border border-borderDark rounded-2xl p-6 text-center mb-6">
+            <p class="text-gray-400 text-sm tracking-widest mb-1">SCAN QR</p>
+            <div class="w-48 h-48 mx-auto bg-white rounded-xl p-2 flex items-center justify-center mb-4">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=Deewuuu01@ptyes&pn=LuxxPay" alt="QR Code" class="w-full h-full object-contain rounded-lg">
+            </div>
+            <p class="text-gray-400 text-xs">Scan with any UPI app</p>
+        </div>
+
+        <div class="bg-card border border-borderDark rounded-2xl p-4 mb-6">
+            <p class="text-gray-400 text-xs tracking-widest mb-1">UPI ID</p>
+            <div class="flex items-center gap-3 mt-2">
+                <div class="flex-1 bg-dark border border-borderDark rounded-xl p-3 flex items-center justify-between">
+                    <span class="text-neonCyan font-mono text-sm truncate">Deewuuu01@ptyes</span>
+                    <button onclick="copyUPI()" class="bg-neonYellow/20 text-neonYellow px-3 py-1 rounded-lg text-xs font-bold">
+                        <i class="fa-regular fa-copy"></i> Copy
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-card border border-borderDark rounded-2xl p-4 text-center mb-6">
+            <p class="text-gray-400 text-xs tracking-widest mb-1">PAY EXACT:</p>
+            <p class="text-2xl font-bold text-neonYellow">₹<span id="summary-amount-2">5,000</span></p>
+        </div>
+
+        <div class="bg-card border border-borderDark rounded-2xl p-5 mb-6">
+            <p class="font-bold text-sm text-white">ENTER UTR NUMBER</p>
+            <p class="text-gray-500 text-xs mb-4">输入 UTR 编号</p>
+            <div class="relative mb-2">
+                <i class="fa-solid fa-receipt absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                <input type="text" id="acc-payment-utr" placeholder="Enter UTR number" class="custom-input">
+            </div>
+            <p class="text-gray-500 text-[10px]">Find UTR in your UPI app's payment history</p>
+        </div>
+
+        <button onclick="submitAccPayment()" class="w-full bg-card border-2 border-borderDark text-gray-500 font-bold py-4 rounded-xl mb-3 cursor-not-allowed" id="acc-payment-btn" disabled>
+            ENTER UTR TO CONTINUE <br><span class="text-xs font-normal">输入 UTR 以继续</span>
+        </button>
+
+        <button onclick="cancelAccPayment()" class="w-full bg-card border border-borderDark text-gray-400 font-bold py-3 rounded-xl mb-6">
+            ← BACK TO DETAILS
+        </button>
+    </div>
+
+    <!-- ================= PAGE 6: GAMING + CARD ================= -->
+    <div id="page-gaming" class="page-view p-5">
+        <div class="mb-6">
+            <p class="text-neonCyan text-sm tracking-widest">CUSTOMER WORKSPACE</p>
+            <h2 class="text-3xl font-bold font-display mt-1">Gaming+Card</h2>
+            <p class="text-gray-500 text-sm">游戏+卡</p>
+        </div>
+
+        <div class="bg-card border border-neonCyan rounded-2xl p-4 mb-6">
+            <p class="text-neonCyan text-xs text-center tracking-widest mb-1">SECURITY DEPOSIT REQUIRED</p>
+            <div class="flex items-center gap-4 my-4">
+                <div class="w-12 h-12 rounded-xl bg-neonCyan/10 flex items-center justify-center">
+                    <i class="fa-solid fa-shield-halved text-neonCyan text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-3xl font-bold text-neonCyan">₹10,000</p>
+                    <p class="text-gray-400 text-xs mt-1">Gaming Fund · Saving Account</p>
+                </div>
+            </div>
+            <button class="w-full bg-neonCyan/20 text-neonCyan font-bold py-3 rounded-xl border border-neonCyan/50">
+                OPEN PAYMENT DETAILS
+            </button>
+        </div>
+
+        <div class="bg-card border border-borderDark rounded-2xl p-5 mb-6">
+            <p class="text-neonCyan text-xs tracking-widest">NEW PROFILE</p>
+            <h3 class="text-2xl font-bold font-display mt-1 mb-4">Add Gaming Card</h3>
+            <div class="space-y-4">
+                <div><label class="text-gray-400 text-xs block mb-1">CARD HOLDER NAME</label><input type="text" placeholder="Full name" class="custom-input"></div>
+                <div><label class="text-gray-400 text-xs block mb-1">CUSTOMER EMAIL</label><input type="email" placeholder="customer@example.com" class="custom-input"></div>
+                <div><label class="text-gray-400 text-xs block mb-1">BANK / ISSUER</label><input type="text" placeholder="Bank" class="custom-input"></div>
+                <div><label class="text-gray-400 text-xs block mb-1">MOBILE NUMBER</label><input type="tel" placeholder="10-digit" class="custom-input" maxlength="10" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)"></div>
+                <button class="w-full bg-gradient-to-r from-neonCyan to-blue-500 text-black font-bold py-4 rounded-xl mt-4">
+                    SAVE CARD REVIEW PROFILE
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= PAGE 7: WITHDRAW ================= -->
+    <div id="page-withdraw" class="page-view p-5">
+        <div class="mb-4">
+            <h2 class="text-3xl font-bold font-display">Withdraw</h2>
+            <p class="text-gray-500 text-sm">提现</p>
+        </div>
+
+        <div class="flex bg-card rounded-full p-1 border border-borderDark mb-6">
+            <button type="button" onclick="switchWithdrawTab('withdraw', this)" id="wtab-withdraw" class="flex-1 py-3 rounded-full text-sm font-bold transition-all bg-neonCyan text-black glow-cyan">WITHDRAW</button>
+            <button type="button" onclick="switchWithdrawTab('history', this)" id="wtab-history" class="flex-1 py-3 rounded-full text-sm font-bold transition-all text-gray-400">HISTORY</button>
+        </div>
+
+        <div id="withdraw-tab-content">
+            <div class="bg-gradient-to-br from-neonGreen/10 to-neonGreen/5 border border-neonGreen rounded-2xl p-5 mb-6 glow-green">
+                <div class="flex justify-between items-start mb-2">
+                    <div>
+                        <p class="text-gray-400 text-xs tracking-widest">WITHDRAWABLE COMMISSION</p>
+                        <p class="text-gray-600 text-[10px] mt-1">可提现佣金</p>
+                    </div>
+                    <i class="fa-solid fa-arrow-trend-up text-neonGreen text-2xl"></i>
+                </div>
+                <p class="text-neonGreen text-4xl font-bold font-display mt-3" id="withdraw-commission">₹0</p>
+                <div class="flex items-center justify-between mt-3">
+                    <p class="text-gray-500 text-xs">Available for withdrawal</p>
+                    <p class="text-neonGreen text-[10px] font-bold" id="withdraw-commission-rate">5% Commission</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="bg-card border border-neonCyan rounded-2xl p-4">
+                    <p class="text-gray-500 text-xs">USDT BALANCE</p>
+                    <p class="text-neonCyan text-2xl font-bold mt-2">$0</p>
+                </div>
+                <div class="bg-card border border-neonYellow rounded-2xl p-4">
+                    <p class="text-gray-500 text-xs">MIN WITHDRAWAL</p>
+                    <p class="text-neonYellow text-2xl font-bold mt-2">₹5,000</p>
+                </div>
+            </div>
+
+            <p class="text-gray-400 text-xs tracking-widest mb-1">SELECT PAYOUT METHOD</p>
+            <p class="text-gray-600 text-[10px] mb-3">选择收款方式</p>
+            
+            <div class="space-y-3 mb-6">
+                <div onclick="selectPayoutMethod('upi')" id="payout-upi" class="payout-card bg-card border-2 border-neonYellow rounded-2xl p-4 flex justify-between items-center cursor-pointer">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-xl bg-neonYellow/20 flex items-center justify-center">
+                            <span class="text-neonYellow font-bold text-xs">UPI</span>
+                        </div>
+                        <div>
+                            <p class="font-bold text-white text-sm">UPI Withdraw</p>
+                            <p class="text-gray-500 text-xs">UPI 提现</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-end gap-2">
+                        <span class="text-neonYellow text-[10px] border border-neonYellow px-2 py-0.5 rounded-full">MIN ₹5,000</span>
+                        <div class="payout-radio"><div class="payout-radio-inner"></div></div>
+                    </div>
+                </div>
+                <div onclick="selectPayoutMethod('bank')" id="payout-bank" class="payout-card bg-card border-2 border-borderDark rounded-2xl p-4 flex justify-between items-center cursor-pointer opacity-70">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-xl bg-gray-800 flex items-center justify-center">
+                            <span class="text-gray-400 font-bold text-xs">ATM</span>
+                        </div>
+                        <div>
+                            <p class="font-bold text-white text-sm">Bank Account</p>
+                            <p class="text-gray-500 text-xs">银行账户</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-end gap-2">
+                        <span class="text-gray-500 text-[10px] border border-gray-600 px-2 py-0.5 rounded-full">MIN ₹5,000</span>
+                        <div class="payout-radio"><div class="payout-radio-inner"></div></div>
+                    </div>
+                </div>
+                <div onclick="selectPayoutMethod('usdt')" id="payout-usdt" class="payout-card bg-card border-2 border-borderDark rounded-2xl p-4 flex justify-between items-center cursor-pointer opacity-70">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-xl bg-gray-800 flex items-center justify-center">
+                            <span class="text-gray-400 font-bold text-xs">TRC</span>
+                        </div>
+                        <div>
+                            <p class="font-bold text-white text-sm">USDT Withdraw</p>
+                            <p class="text-gray-500 text-xs">USDT 提现</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-end gap-2">
+                        <span class="text-gray-500 text-[10px] border border-gray-600 px-2 py-0.5 rounded-full">MIN 1000 USDT</span>
+                        <div class="payout-radio"><div class="payout-radio-inner"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <p class="text-gray-400 text-xs tracking-widest mb-1">UPI ID</p>
+            <div class="relative mb-6">
+                <i class="fa-solid fa-at absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                <input type="text" id="withdraw-upi" placeholder="yourname@upi / 您的UPI ID" class="custom-input">
+            </div>
+
+            <p class="text-gray-400 text-xs tracking-widest mb-1">AMOUNT (INR)</p>
+            <div class="relative mb-2">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-neonCyan font-bold">₹</span>
+                <input type="number" id="withdraw-amount" placeholder="Enter amount" class="custom-input pl-10">
+            </div>
+            <div class="flex justify-between mb-6">
+                <span class="text-gray-500 text-xs">Available Commission</span>
+                <span class="text-neonGreen text-xs font-bold" id="withdraw-available">₹0</span>
+            </div>
+
+            <p class="text-gray-400 text-xs tracking-widest mb-1">TRANSACTION PASSWORD</p>
+            <div class="relative mb-4">
+                <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                <input type="password" id="withdraw-password" placeholder="Required for withdrawal" class="custom-input">
+            </div>
+
+            <div class="bg-card border border-neonGreen/30 rounded-2xl p-4 flex gap-3 mb-6">
+                <i class="fa-solid fa-shield-halved text-neonGreen mt-1"></i>
+                <p class="text-gray-400 text-xs leading-relaxed">All withdrawals are encrypted and processed after admin approval within 24 hours.</p>
+            </div>
+
+            <button onclick="submitWithdrawal()" class="w-full bg-gradient-to-r from-neonCyan to-blue-500 text-black font-bold py-4 rounded-xl glow-cyan mb-3">
+                INITIATE WITHDRAWAL <br><span class="text-xs font-normal">发起提现</span>
+            </button>
+        </div>
+
+        <div id="withdraw-history-content" style="display: none;">
+            <p class="text-gray-400 text-xs tracking-widest mb-1">WITHDRAWAL HISTORY</p>
+            <p class="text-gray-600 text-[10px] mb-3">提现记录</p>
+            <div class="space-y-3" id="withdraw-history-list">
+                <div class="border-2 border-dashed border-borderDark rounded-2xl p-8 text-center" id="withdraw-history-empty">
+                    <i class="fa-solid fa-money-bill-transfer text-gray-600 text-4xl mb-3"></i>
+                    <p class="font-bold text-white">No withdrawal yet</p>
+                    <p class="text-gray-500 text-xs mt-1">暂无提现记录</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= PAGE 8: HISTORY ================= -->
+    <div id="page-history" class="page-view p-5">
+        <div class="mb-6">
+            <p class="text-gray-400 text-sm tracking-widest">LUXXPAY</p>
+            <h2 class="text-3xl font-bold font-display">Transaction History</h2>
+            <p class="text-gray-500 text-sm">交易记录</p>
+            <p class="text-gray-600 text-xs mt-1" id="history-count">0 total — All time</p>
+        </div>
+
+        <div class="flex gap-2 overflow-x-auto pb-2 mb-6">
+            <button onclick="filterHistory('all', this)" class="filter-btn active">ALL</button>
+            <button onclick="filterHistory('credit', this)" class="filter-btn">CREDIT</button>
+            <button onclick="filterHistory('debit', this)" class="filter-btn">DEBIT</button>
+            <button onclick="filterHistory('pending', this)" class="filter-btn">PENDING</button>
+        </div>
+
+        <div class="space-y-3" id="history-list">
+            <div class="border-2 border-dashed border-borderDark rounded-2xl p-8 text-center" id="empty-history">
+                <i class="fa-solid fa-receipt text-gray-600 text-4xl mb-3"></i>
+                <p class="font-bold text-white">No transactions yet</p>
+                <p class="text-gray-500 text-xs mt-1">暂无交易记录</p>
+            </div>
+        </div>
+
+        <div id="no-filter-result" class="hidden border-2 border-dashed border-borderDark rounded-2xl p-8 text-center mt-3">
+            <i class="fa-solid fa-filter-circle-xmark text-gray-600 text-4xl mb-3"></i>
+            <p class="font-bold text-white">No matching transactions</p>
+        </div>
+    </div>
+
+    <!-- ================= PAGE 9: PROFILE ================= -->
+    <div id="page-profile" class="page-view p-5">
+        <div class="text-center mt-4 mb-6">
+            <div class="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-neonYellow/30 to-neonGreen/20 border-2 border-neonYellow flex items-center justify-center relative mb-4 overflow-hidden">
+                <span class="text-4xl font-bold text-neonYellow" id="profile-initial">U</span>
+                <img id="profile-photo" src="" alt="" class="absolute inset-0 w-full h-full object-cover rounded-full hidden">
+                <div onclick="document.getElementById('profile-photo-input').click()" class="absolute bottom-0 right-0 w-8 h-8 bg-neonGreen rounded-full flex items-center justify-center border-2 border-dark cursor-pointer hover:bg-neonGreen/80 transition-all z-10">
+                    <i class="fa-solid fa-camera text-black text-xs"></i>
+                </div>
+                <input type="file" id="profile-photo-input" class="hidden" accept="image/*" onchange="handleProfilePhoto(event)">
+            </div>
+            <h2 class="text-3xl font-bold font-display tracking-widest" id="profile-display-name">User</h2>
+            <p class="text-gray-500 text-sm mt-1" id="profile-display-username">@user</p>
+            <p class="text-gray-600 text-xs mt-1" id="profile-display-contact">your@email.com · 0000000000</p>
+            <div class="inline-block mt-4 px-6 py-2 rounded-full border border-neonYellow bg-neonYellow/5">
+                <p class="text-neonYellow text-xs font-bold tracking-widest">PREMIUM MEMBER</p>
+                <p class="text-neonYellow/70 text-[10px]">高级会员</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3 mb-6">
+            <div class="bg-card border border-borderDark rounded-2xl p-4 text-center">
+                <p class="text-white font-bold text-lg font-display">2026-08</p>
+                <p class="text-gray-500 text-[10px] mt-1 tracking-widest">JOINED</p>
+            </div>
+            <div class="bg-card border border-borderDark rounded-2xl p-4 text-center">
+                <p class="text-white font-bold text-lg font-display" id="profile-tx-count">0</p>
+                <p class="text-gray-500 text-[10px] mt-1 tracking-widest">TRANSACTIONS</p>
+            </div>
+            <div class="bg-card border border-borderDark rounded-2xl p-4 text-center">
+                <p class="text-white font-bold text-lg font-display" id="profile-accounts-count">0</p>
+                <p class="text-gray-500 text-[10px] mt-1 tracking-widest">ACCOUNTS</p>
+            </div>
+        </div>
+
+        <p class="text-gray-400 text-xs tracking-widest mb-1">WALLET BALANCES</p>
+        <p class="text-gray-600 text-[10px] mb-3">钱包余额</p>
+        <div class="grid grid-cols-2 gap-4 mb-4">
+            <div class="bg-gradient-to-br from-neonYellow/10 to-neonYellow/5 border border-neonYellow rounded-2xl p-4">
+                <i class="fa-solid fa-wallet text-neonYellow text-xl mb-3"></i>
+                <p class="text-white font-bold text-2xl font-display">₹0</p>
+                <p class="text-gray-400 text-[10px] mt-2 tracking-widest">GAMING FUND</p>
+                <p class="text-gray-600 text-[9px]">游戏基金钱包</p>
+            </div>
+            <div class="bg-gradient-to-br from-neonCyan/10 to-neonCyan/5 border border-neonCyan rounded-2xl p-4">
+                <i class="fa-solid fa-wallet text-neonCyan text-xl mb-3"></i>
+                <p class="text-white font-bold text-2xl font-display">$0</p>
+                <p class="text-gray-400 text-[10px] mt-2 tracking-widest">STOCK FUND</p>
+                <p class="text-gray-600 text-[9px]">股票基金钱包</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <div class="bg-gradient-to-br from-neonGreen/10 to-neonGreen/5 border border-neonGreen rounded-2xl p-4">
+                <i class="fa-solid fa-arrow-trend-up text-neonGreen text-xl mb-3"></i>
+                <p class="text-neonGreen font-bold text-2xl font-display" id="profile-total-commission">₹0</p>
+                <p class="text-gray-400 text-[10px] mt-2 tracking-widest">TOTAL COMMISSION</p>
+                <p class="text-gray-600 text-[9px]">佣金</p>
+            </div>
+            <div class="bg-card border border-borderDark rounded-2xl p-4">
+                <i class="fa-regular fa-credit-card text-gray-400 text-xl mb-3"></i>
+                <p class="text-white font-bold text-2xl font-display" id="profile-total-deposited">₹0</p>
+                <p class="text-gray-400 text-[10px] mt-2 tracking-widest">TOTAL DEPOSITED</p>
+                <p class="text-gray-600 text-[9px]">总存款</p>
+            </div>
+        </div>
+
+        <p class="text-gray-400 text-xs tracking-widest mb-1">RECENT TRANSACTIONS</p>
+        <p class="text-gray-600 text-[10px] mb-3">最近交易</p>
+        <div class="bg-card border border-borderDark rounded-2xl p-4 mb-6" id="profile-tx-box">
+            <div class="text-center py-4" id="profile-tx-empty">
+                <i class="fa-solid fa-receipt text-gray-600 text-3xl mb-2"></i>
+                <p class="text-gray-500 text-xs">No transactions yet</p>
+                <p class="text-gray-600 text-[10px] mt-1">暂无交易记录</p>
+            </div>
+            <div class="space-y-2" id="profile-tx-list"></div>
+        </div>
+
+        <button onclick="handleLogout()" class="w-full bg-neonRed/10 border border-neonRed/50 text-neonRed font-bold py-4 rounded-xl flex items-center justify-center gap-2">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i> LOGOUT
+        </button>
+    </div>
+
+    <!-- BOTTOM NAV -->
+    <nav id="bottom-nav" class="fixed bottom-4 left-1/2 -translate-x-1/2 w-[90%] max-w-[440px] bg-card border border-borderDark rounded-full p-2 justify-between items-center z-50 shadow-[0_0_20px_rgba(0,0,0,0.8)] backdrop-blur-md bg-opacity-90" style="display: none;">
+        <button onclick="showPage('page-home')" id="nav-page-home" class="nav-item flex flex-col items-center gap-1 flex-1 py-2 text-neonYellow">
+            <i class="fa-solid fa-house text-lg"></i>
+            <span class="text-[10px] font-bold">HOME</span>
+        </button>
+        <button onclick="showPage('page-add-acc')" id="nav-page-add-acc" class="nav-item flex flex-col items-center gap-1 flex-1 py-2 text-gray-500">
+            <i class="fa-solid fa-circle-plus text-lg"></i>
+            <span class="text-[10px] font-bold">ADD ACC</span>
+        </button>
+        <button onclick="showPage('page-gaming')" id="nav-page-gaming" class="nav-item flex flex-col items-center gap-1 flex-1 py-2 text-gray-500">
+            <i class="fa-regular fa-credit-card text-lg"></i>
+            <span class="text-[10px] font-bold text-center leading-tight">GAMING+CARD</span>
+        </button>
+        <button onclick="showPage('page-profile')" id="nav-page-profile" class="nav-item flex flex-col items-center gap-1 flex-1 py-2 text-gray-500">
+            <i class="fa-regular fa-user text-lg"></i>
+            <span class="text-[10px] font-bold">PROFILE</span>
+        </button>
+    </nav>
+
+</div>
+
+<script>
+    var SECRET_UTR = "11223344556677";
+    var memoryUser = null;
+    var storageAvailable = true;
+    try {
+        localStorage.setItem('__test__', '1');
+        localStorage.removeItem('__test__');
+    } catch (e) { storageAvailable = false; }
+
+    // ========== MULTI-USER STORAGE ==========
+    function getAllUsers() {
+        if (!storageAvailable) return {};
+        try {
+            var d = localStorage.getItem('luxxpay_all_users');
+            return d ? JSON.parse(d) : {};
+        } catch(e) { return {}; }
+    }
+    function saveAllUsers(users) {
+        if (storageAvailable) {
+            try { localStorage.setItem('luxxpay_all_users', JSON.stringify(users)); } catch(e) {}
+        }
+    }
+    function saveUserData(user) {
+        var users = getAllUsers();
+        users[user.username] = user;
+        saveAllUsers(users);
+        memoryUser = user;
+        return true;
+    }
+    function getUserData() {
+        if (memoryUser) return memoryUser;
+        if (storageAvailable) {
+            try {
+                var currentUsername = localStorage.getItem('luxxpay_current_user');
+                if (currentUsername) {
+                    var users = getAllUsers();
+                    if (users[currentUsername]) {
+                        memoryUser = users[currentUsername];
+                        return memoryUser;
+                    }
+                }
+            } catch(e) {}
+        }
+        return null;
+    }
+    function setCurrentUser(username) {
+        if (storageAvailable) {
+            try { localStorage.setItem('luxxpay_current_user', username); } catch(e) {}
+        }
+    }
+    function clearCurrentUser() {
+        if (storageAvailable) {
+            try { localStorage.removeItem('luxxpay_current_user'); } catch(e) {}
+        }
+    }
+    function isUserLoggedIn() {
+        if (storageAvailable) {
+            try { return localStorage.getItem('luxxpay_logged_in') === 'true'; } catch(e) {}
+        }
+        return false;
+    }
+    function setLoggedIn(val) {
+        if (storageAvailable) {
+            try { localStorage.setItem('luxxpay_logged_in', val ? 'true' : 'false'); } catch(e) {}
+        }
+    }
+
+    // ========== APP STATE ==========
+    function getAppStateKey() {
+        var user = getUserData();
+        if (user && user.username) return 'luxxpay_state_' + user.username;
+        return 'luxxpay_state_guest';
+    }
+
+    function saveAppState() {
+        if (!storageAvailable) return;
+        var state = {
+            txCount: txCount, currentDepositAmount: currentDepositAmount, historyItems: historyItems,
+            totalCredit: totalCredit, totalDebit: totalDebit, totalDeposited: totalDeposited,
+            totalCommission: totalCommission, walletBalance: walletBalance,
+            selectedFund: selectedFund, selectedAccType: selectedAccType, selectedAccName: selectedAccName,
+            selectedAmount: selectedAmount, selectedCommissionRate: selectedCommissionRate,
+            selectedPayout: selectedPayout, liveTxTickCount: liveTxTickCount, liveTxRate: liveTxRate,
+            liveTxRunning: liveTxRunning, accountActive: accountActive,
+            activeFundType: activeFundType, activeFundName: activeFundName, activeAccName: activeAccName,
+            activeAmount: activeAmount, activeRate: activeRate, sessionStartTime: sessionStartTime,
+            transactions: transactions, withdrawHistory: withdrawHistory, bankAccounts: bankAccounts
+        };
+        try { localStorage.setItem(getAppStateKey(), JSON.stringify(state)); } catch(e) {}
+    }
+
+    function loadAppState() {
+        if (!storageAvailable) return;
+        try {
+            var raw = localStorage.getItem(getAppStateKey());
+            if (!raw) return;
+            var s = JSON.parse(raw);
+            if (typeof s.txCount === 'number') txCount = s.txCount;
+            if (typeof s.currentDepositAmount === 'number') currentDepositAmount = s.currentDepositAmount;
+            if (typeof s.historyItems === 'number') historyItems = s.historyItems;
+            if (typeof s.totalCredit === 'number') totalCredit = s.totalCredit;
+            if (typeof s.totalDebit === 'number') totalDebit = s.totalDebit;
+            if (typeof s.totalDeposited === 'number') totalDeposited = s.totalDeposited;
+            if (typeof s.totalCommission === 'number') totalCommission = s.totalCommission;
+            if (typeof s.walletBalance === 'number') walletBalance = s.walletBalance;
+            if (s.selectedFund) selectedFund = s.selectedFund;
+            if (s.selectedAccType) selectedAccType = s.selectedAccType;
+            if (s.selectedAccName) selectedAccName = s.selectedAccName;
+            if (typeof s.selectedAmount === 'number') selectedAmount = s.selectedAmount;
+            if (typeof s.selectedCommissionRate === 'number') selectedCommissionRate = s.selectedCommissionRate;
+            if (s.selectedPayout) selectedPayout = s.selectedPayout;
+            if (typeof s.liveTxTickCount === 'number') liveTxTickCount = s.liveTxTickCount;
+            if (typeof s.liveTxRate === 'number') liveTxRate = s.liveTxRate;
+            if (typeof s.liveTxRunning === 'boolean') liveTxRunning = s.liveTxRunning;
+            if (typeof s.accountActive === 'boolean') accountActive = s.accountActive;
+            if (s.activeFundType) activeFundType = s.activeFundType;
+            if (s.activeFundName) activeFundName = s.activeFundName;
+            if (s.activeAccName) activeAccName = s.activeAccName;
+            if (typeof s.activeAmount === 'number') activeAmount = s.activeAmount;
+            if (typeof s.activeRate === 'number') activeRate = s.activeRate;
+            if (typeof s.sessionStartTime === 'number') sessionStartTime = s.sessionStartTime;
+            if (Array.isArray(s.transactions)) transactions = s.transactions;
+            if (Array.isArray(s.withdrawHistory)) withdrawHistory = s.withdrawHistory;
+            if (Array.isArray(s.bankAccounts)) bankAccounts = s.bankAccounts;
+        } catch(e) {}
+    }
+
+    // ========== GLOBAL STATE ==========
+    var txCount = 0;
+    var currentDepositAmount = 5000;
+    var historyItems = 0;
+    var currentFilter = 'all';
+    var selectedFund = 'gaming';
+    var selectedAccType = 'saving';
+    var selectedAccName = 'Saving Account';
+    var selectedAmount = 5000;
+    var selectedCommissionRate = 5;
+    var currentTimerInterval = null;
+    var totalCredit = 0, totalDebit = 0, totalDeposited = 0, totalCommission = 0;
+    var walletBalance = 0;
+    var selectedPayout = 'upi';
+    var liveTxInterval = null;
+    var liveTxTickCount = 0;
+    var liveTxRate = 5;
+    var liveTxRunning = false;
+    var profilePhotoData = null;
+    var transactions = [];
+    var withdrawHistory = [];
+    var bankAccounts = [];
+    var accountActive = false;
+    var activeFundType = 'gaming';
+    var activeFundName = 'Gaming Fund';
+    var activeAccName = 'Saving Account';
+    var activeAmount = 5000;
+    var activeRate = 5;
+    var sessionStartTime = 0;
+    var liveSessionTimeout = null;
+    var LIVE_SESSION_WAIT_MS = 60 * 1000;
+    var planSelectedFund = 'gaming';
+    var planSelectedAccount = 'saving';
+    var planSelectedAmount = 5000;
+    var planSelectedRate = 5;
+
+    // ========== TOAST ==========
+    function showToast(message, type) {
+        type = type || 'info';
+        var container = document.getElementById('toast-container');
+        var icons = { success: 'fa-circle-check', error: 'fa-circle-xmark', info: 'fa-circle-info' };
+        var toast = document.createElement('div');
+        toast.className = 'toast ' + type;
+        toast.innerHTML = '<i class="fa-solid ' + icons[type] + '"></i><span>' + message + '</span>';
+        container.appendChild(toast);
+        setTimeout(function() { toast.style.opacity = '0'; toast.style.transition = 'opacity 0.3s'; }, 3000);
+        setTimeout(function() { toast.remove(); }, 3300);
+    }
+
+    function showPage(pageId) {
+        document.querySelectorAll('.page-view').forEach(function(p) { p.classList.remove('active'); });
+        var targetPage = document.getElementById(pageId);
+        if (targetPage) {
+            targetPage.classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        document.querySelectorAll('.nav-item').forEach(function(i) {
+            i.classList.remove('text-neonYellow');
+            i.classList.add('text-gray-500');
+        });
+        var activeNav = document.getElementById('nav-' + pageId);
+        if (activeNav) {
+            activeNav.classList.remove('text-gray-500');
+            activeNav.classList.add('text-neonYellow');
+        }
+        var bottomNav = document.getElementById('bottom-nav');
+        if (bottomNav) bottomNav.style.display = (pageId === 'page-auth') ? 'none' : 'flex';
+        
+        if (pageId === 'page-deposit') startTimer('deposit-timer', 180);
+        else if (pageId === 'page-acc-payment') startTimer('acc-timer', 180);
+        else if (pageId === 'page-withdraw') {
+            switchWithdrawTab('withdraw', document.getElementById('wtab-withdraw'));
+            updateAllStats();
+        } else if (pageId === 'page-live-tx') {
+            updateLiveStats();
+            updateLiveStatusUI();
+            updatePauseButtonUI();
+        }
+        if (pageId === 'page-home') {
+            renderActiveAccounts();
+            updateHomeActiveSection();
+        }
+    }
+
+    function startTimer(elementId, seconds) {
+        if (currentTimerInterval) clearInterval(currentTimerInterval);
+        var el = document.getElementById(elementId);
+        if (!el) return;
+        var timer = seconds;
+        function update() {
+            var m = Math.floor(timer / 60);
+            var s = timer % 60;
+            el.innerText = String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+            if (timer <= 60) el.classList.add('timer-warning');
+        }
+        update();
+        currentTimerInterval = setInterval(function() {
+            timer--;
+            if (timer < 0) {
+                clearInterval(currentTimerInterval);
+                currentTimerInterval = null;
+                timer = 0;
+                update();
+                showToast('Session expired!', 'error');
+                return;
+            }
+            update();
+        }, 1000);
+    }
+
+    function toggleAuth(type) {
+        var btnSignin = document.getElementById('btn-signin');
+        var btnRegister = document.getElementById('btn-register');
+        var formSignin = document.getElementById('form-signin');
+        var formRegister = document.getElementById('form-register');
+        clearAllErrors();
+        if (type === 'signin') {
+            btnSignin.classList.add('bg-neonYellow', 'text-black', 'glow-yellow');
+            btnSignin.classList.remove('text-gray-400');
+            btnRegister.classList.remove('bg-neonYellow', 'text-black', 'glow-yellow');
+            btnRegister.classList.add('text-gray-400');
+            formSignin.classList.remove('hidden');
+            formRegister.classList.add('hidden');
+        } else {
+            btnRegister.classList.add('bg-neonYellow', 'text-black', 'glow-yellow');
+            btnRegister.classList.remove('text-gray-400');
+            btnSignin.classList.remove('bg-neonYellow', 'text-black', 'glow-yellow');
+            btnSignin.classList.add('text-gray-400');
+            formRegister.classList.remove('hidden');
+            formSignin.classList.add('hidden');
+        }
+    }
+
+    function togglePassword(inputId, icon) {
+        var input = document.getElementById(inputId);
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.add('fa-eye');
+            icon.classList.remove('fa-eye-slash');
+        }
+    }
+
+    function showError(inputId, errorId) {
+        var input = document.getElementById(inputId);
+        var error = document.getElementById(errorId);
+        if (input) input.classList.add('error');
+        if (error) error.classList.add('show');
+    }
+    function clearAllErrors() {
+        document.querySelectorAll('.custom-input').forEach(function(el) { el.classList.remove('error', 'success'); });
+        document.querySelectorAll('.error-text').forEach(function(el) { el.classList.remove('show'); });
+    }
+    function isValidEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
+    function isValidMobile(mobile) { return /^[0-9]{10}$/.test(mobile); }
+
+    var regMobileInput = document.getElementById('reg-mobile');
+    if (regMobileInput) {
+        regMobileInput.addEventListener('input', function() {
+            this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);
+        });
+    }
+
+    // ========== PROFILE PHOTO ==========
+    function getPhotoKey() {
+        var user = getUserData();
+        return user ? 'luxxpay_photo_' + user.username : 'luxxpay_photo_guest';
+    }
+    function handleProfilePhoto(event) {
+        var file = event.target.files[0];
+        if (file) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                profilePhotoData = e.target.result;
+                var photoEl = document.getElementById('profile-photo');
+                var initialEl = document.getElementById('profile-initial');
+                photoEl.src = profilePhotoData;
+                photoEl.classList.remove('hidden');
+                initialEl.classList.add('hidden');
+                if (storageAvailable) {
+                    try { localStorage.setItem(getPhotoKey(), profilePhotoData); } catch(e) {}
+                }
+                showToast('Profile photo updated!', 'success');
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+    function loadProfilePhoto() {
+        var photoEl = document.getElementById('profile-photo');
+        var initialEl = document.getElementById('profile-initial');
+        if (!photoEl) return;
+        if (storageAvailable) {
+            try {
+                var saved = localStorage.getItem(getPhotoKey());
+                if (saved) {
+                    profilePhotoData = saved;
+                    photoEl.src = saved;
+                    photoEl.classList.remove('hidden');
+                    initialEl.classList.add('hidden');
+                }
+            } catch(e) {}
+        }
+    }
+
+    // ========== REGISTER ==========
+    function handleRegister() {
+        clearAllErrors();
+        var valid = true;
+        var fullname = document.getElementById('reg-fullname').value.trim();
+        var email = document.getElementById('reg-email').value.trim();
+        var mobile = document.getElementById('reg-mobile').value.trim();
+        var username = document.getElementById('reg-username').value.trim().toLowerCase();
+        var password = document.getElementById('reg-password').value;
+
+        if (fullname.length < 2) { showError('reg-fullname', 'err-reg-fullname'); valid = false; }
+        if (!isValidEmail(email)) { showError('reg-email', 'err-reg-email'); valid = false; }
+        if (!isValidMobile(mobile)) { showError('reg-mobile', 'err-reg-mobile'); valid = false; }
+        if (username.length < 3) { showError('reg-username', 'err-reg-username'); valid = false; }
+        if (password.length < 6) { showError('reg-password', 'err-reg-password'); valid = false; }
+        if (!valid) { showToast('Please fix the errors above', 'error'); return; }
+
+        var allUsers = getAllUsers();
+        if (allUsers[username]) {
+            showError('reg-username', 'err-reg-username');
+            document.getElementById('err-reg-username').innerText = 'Username already taken! Try another.';
+            showToast('Username already exists!', 'error');
+            return;
+        }
+
+        var user = {
+            fullname: fullname, email: email, mobile: mobile,
+            username: username, password: password, joined: '2026-08'
+        };
+        saveUserData(user);
+        setCurrentUser(username);
+        setLoggedIn(true);
+
+        // Reset per-user state
+        txCount = 0; totalCredit = 0; totalDebit = 0; totalDeposited = 0;
+        totalCommission = 0; walletBalance = 0; transactions = []; withdrawHistory = [];
+        bankAccounts = []; accountActive = false; liveTxRunning = false; liveTxTickCount = 0;
+        if (liveTxInterval) { clearInterval(liveTxInterval); liveTxInterval = null; }
+        if (liveSessionTimeout) { clearTimeout(liveSessionTimeout); liveSessionTimeout = null; }
+        saveAppState();
+
+        applyUserToUI(user);
+        clearRegisterForm();
+        showToast('Account created! Welcome ' + fullname, 'success');
+        setTimeout(function() { showPage('page-home'); }, 800);
+    }
+
+    function applyUserToUI(user) {
+        document.getElementById('home-display-name').innerText = user.fullname.toUpperCase();
+        document.getElementById('profile-display-name').innerText = user.fullname;
+        document.getElementById('profile-initial').innerText = user.fullname.charAt(0).toUpperCase();
+        document.getElementById('profile-display-username').innerText = '@' + user.username;
+        document.getElementById('profile-display-contact').innerText = user.email + ' · ' + user.mobile;
+    }
+    function clearRegisterForm() {
+        document.getElementById('reg-fullname').value = '';
+        document.getElementById('reg-email').value = '';
+        document.getElementById('reg-mobile').value = '';
+        document.getElementById('reg-username').value = '';
+        document.getElementById('reg-password').value = '';
+    }
+
+    // ========== LOGIN ==========
+    function handleLogin() {
+        clearAllErrors();
+        var userId = document.getElementById('login-userid').value.trim().toLowerCase();
+        var password = document.getElementById('login-password').value;
+
+        if (userId.length === 0) { showError('login-userid', 'err-login-userid'); return; }
+        if (password.length === 0) { showError('login-password', 'err-login-password'); return; }
+
+        var allUsers = getAllUsers();
+        var storedUser = null;
+        for (var key in allUsers) {
+            var u = allUsers[key];
+            if (u.username === userId || (u.email && u.email.toLowerCase() === userId)) {
+                storedUser = u; break;
+            }
+        }
+
+        if (!storedUser) {
+            showToast('No account found! Please REGISTER first', 'error');
+            setTimeout(function() { toggleAuth('register'); }, 800);
+            return;
+        }
+        if (password !== storedUser.password) {
+            showError('login-password', 'err-login-password');
+            showToast('Wrong Password!', 'error');
+            return;
+        }
+
+        memoryUser = storedUser;
+        setCurrentUser(storedUser.username);
+        setLoggedIn(true);
+        loadAppState();
+        loadProfilePhoto();
+        applyUserToUI(storedUser);
+        
+        document.getElementById('login-userid').value = '';
+        document.getElementById('login-password').value = '';
+
+        // UI refresh
+        updateAllStats();
+        renderTransactions();
+        renderProfileTransactions();
+        renderBankAccounts();
+        renderActiveAccounts();
+        renderWithdrawHistory();
+        updateHistoryCount();
+        updateHomeActiveSection();
+        document.getElementById('profile-tx-count').innerText = txCount;
+        document.getElementById('profile-accounts-count').innerText = bankAccounts.length;
+
+        // Resume live session if active
+        if (accountActive) {
+            updateLiveStatusUI();
+            updatePauseButtonUI();
+            if (liveTxRunning) {
+                startLiveFeed();
+            } else {
+                var elapsed = Date.now() - sessionStartTime;
+                var remaining = LIVE_SESSION_WAIT_MS - elapsed;
+                if (remaining > 0) {
+                    if (liveSessionTimeout) clearTimeout(liveSessionTimeout);
+                    liveSessionTimeout = setTimeout(function() {
+                        startLiveFeed();
+                        liveSessionTimeout = null;
+                    }, remaining);
+                } else {
+                    startLiveFeed();
+                }
+            }
+        }
+
+        showToast('Login successful! Welcome ' + storedUser.fullname, 'success');
+        setTimeout(function() { showPage('page-home'); }, 800);
+    }
+
+    function handleLogout() {
+        saveAppState();
+        setLoggedIn(false);
+        clearCurrentUser();
+        memoryUser = null;
+        toggleAuth('signin');
+        clearAllErrors();
+        document.getElementById('login-userid').value = '';
+        document.getElementById('login-password').value = '';
+        showPage('page-auth');
+        showToast('Logged out! Session continues in background.', 'info');
+    }
+
+    // ========== DEPOSIT PAGE ==========
+    function selectPlanFund(fundType) {
+        planSelectedFund = fundType;
+        var gaming = document.getElementById('plan-fund-gaming');
+        var stock = document.getElementById('plan-fund-stock');
+        if (fundType === 'gaming') {
+            gaming.classList.add('border-neonGreen');
+            gaming.classList.remove('border-borderDark', 'opacity-60');
+            gaming.querySelector('i').className = 'fa-solid fa-gamepad text-neonGreen text-2xl mb-3';
+            gaming.querySelector('.plan-fund-comm').className = 'text-neonGreen text-xs plan-fund-comm';
+            stock.classList.remove('border-neonCyan');
+            stock.classList.add('border-borderDark', 'opacity-60');
+            stock.querySelector('i').className = 'fa-solid fa-chart-line text-gray-400 text-2xl mb-3';
+            stock.querySelector('.plan-fund-comm').className = 'text-gray-500 text-xs plan-fund-comm';
+            planSelectedRate = 5;
+        } else {
+            stock.classList.add('border-neonCyan');
+            stock.classList.remove('border-borderDark', 'opacity-60');
+            stock.querySelector('i').className = 'fa-solid fa-chart-line text-neonCyan text-2xl mb-3';
+            stock.querySelector('.plan-fund-comm').className = 'text-neonCyan text-xs plan-fund-comm';
+            gaming.classList.remove('border-neonGreen');
+            gaming.classList.add('border-borderDark', 'opacity-60');
+            gaming.querySelector('i').className = 'fa-solid fa-gamepad text-gray-400 text-2xl mb-3';
+            gaming.querySelector('.plan-fund-comm').className = 'text-gray-500 text-xs plan-fund-comm';
+            planSelectedRate = 10;
+        }
+        document.getElementById('plans-instruction').style.display = 'none';
+        document.getElementById('plans-account-section').style.display = 'block';
+        updatePlanAmounts(fundType);
+        selectPlanAccount('saving', fundType === 'gaming' ? 5000 : 10000, 'Saving Account');
+    }
+    function updatePlanAmounts(fundType) {
+        var saving = 5000, current = 10000, corporate = 15000;
+        if (fundType === 'stock') { saving = 10000; current = 20000; corporate = 30000; }
+        document.querySelector('#plan-acc-saving .plan-acc-price').innerText = '₹' + saving.toLocaleString('en-IN');
+        document.querySelector('#plan-acc-current .plan-acc-price').innerText = '₹' + current.toLocaleString('en-IN');
+        document.querySelector('#plan-acc-corporate .plan-acc-price').innerText = '₹' + corporate.toLocaleString('en-IN');
+        document.getElementById('plan-acc-saving').setAttribute('onclick', "selectPlanAccount('saving', " + saving + ", 'Saving Account')");
+        document.getElementById('plan-acc-current').setAttribute('onclick', "selectPlanAccount('current', " + current + ", 'Current Account')");
+        document.getElementById('plan-acc-corporate').setAttribute('onclick', "selectPlanAccount('corporate', " + corporate + ", 'Corporate Account')");
+    }
+    function selectPlanAccount(type, amount, name) {
+        planSelectedAccount = type;
+        planSelectedAmount = amount;
+        planSelectedRate = planSelectedFund === 'gaming' ? 5 : 10;
+        ['saving', 'current', 'corporate'].forEach(function(t) {
+            var el = document.getElementById('plan-acc-' + t);
+            el.classList.remove('border-neonYellow');
+            el.classList.add('border-borderDark', 'opacity-60');
+        });
+        var sel = document.getElementById('plan-acc-' + type);
+        sel.classList.add('border-neonYellow');
+        sel.classList.remove('border-borderDark', 'opacity-60');
+    }
+    function proceedToPayment() {
+        if (!planSelectedAccount || planSelectedAmount <= 0) {
+            showToast('Please select account type first', 'error');
+            return;
+        }
+        currentDepositAmount = planSelectedAmount;
+        selectedFund = planSelectedFund;
+        selectedAccName = planSelectedAccount === 'saving' ? 'Saving Account' : 
+                          (planSelectedAccount === 'current' ? 'Current Account' : 'Corporate Account');
+        selectedAccType = planSelectedAccount;
+        selectedCommissionRate = planSelectedRate;
+        document.getElementById('deposit-amount-display').innerText = '₹' + planSelectedAmount.toLocaleString('en-IN');
+        document.getElementById('deposit-utr').value = '';
+        document.getElementById('deposit-utr').classList.remove('error', 'success');
+        showPage('page-deposit');
+    }
+
+    // ========== DEPOSIT ==========
+    function submitDeposit() {
+        var utr = document.getElementById('deposit-utr').value.trim();
+        var utrInput = document.getElementById('deposit-utr');
+        if (utr.length === 0) { utrInput.classList.add('error'); showToast('Please enter UTR', 'error'); return; }
+        if (utr !== SECRET_UTR) {
+            utrInput.classList.add('error'); utrInput.classList.remove('success');
+            showToast('UTR not matched', 'error'); return;
+        }
+        utrInput.classList.remove('error'); utrInput.classList.add('success');
+        txCount++;
+        document.getElementById('profile-tx-count').innerText = txCount;
+        var rate = selectedCommissionRate || 5;
+        var commission = (currentDepositAmount * rate) / 100;
+        totalDeposited += currentDepositAmount;
+        totalCommission += commission;
+        totalCredit += currentDepositAmount;
+        walletBalance += currentDepositAmount;
+        updateAllStats();
+        addTransaction('Success', currentDepositAmount, 'credit');
+        saveAppState();
+        showToast('₹' + currentDepositAmount.toLocaleString('en-IN') + ' credited!', 'success');
+        document.getElementById('deposit-utr').value = '';
+        utrInput.classList.remove('success');
+        setTimeout(function() { showPage('page-home'); }, 800);
+    }
+    function cancelDeposit() {
+        addTransaction('Rejected', currentDepositAmount, 'debit');
+        saveAppState();
+        showToast('Deposit cancelled', 'error');
+        setTimeout(function() { showPage('page-history'); }, 600);
+    }
+
+    // ========== ACCOUNT ACTIVATION ==========
+    function activateAccount(fundType, fundName, accName, amount, rate) {
+        accountActive = true;
+        activeFundType = fundType;
+        activeFundName = fundName;
+        activeAccName = accName;
+        activeAmount = amount;
+        activeRate = rate;
+        liveTxRate = rate;
+        sessionStartTime = Date.now();
+        liveTxRunning = false;
+        saveAppState();
+        showToast('Account activated!', 'success');
+        if (liveSessionTimeout) { clearTimeout(liveSessionTimeout); liveSessionTimeout = null; }
+        showToast('Live session will start in 1 minute...', 'info');
+        liveSessionTimeout = setTimeout(function() {
+            startLiveFeed();
+            liveSessionTimeout = null;
+        }, LIVE_SESSION_WAIT_MS);
+        updateHomeActiveSection();
+    }
+
+    // ========== LIVE FEED ==========
+    function startLiveFeed() {
+        if (liveTxRunning) return;
+        if (!accountActive) { showToast('Please activate an account first', 'error'); return; }
+        liveTxRunning = true;
+        updateLiveStatusUI();
+        updatePauseButtonUI();
+        var banner = document.getElementById('live-session-banner');
+        if (banner) banner.style.display = 'block';
+        var bannerFund = document.getElementById('live-banner-fund');
+        if (bannerFund) bannerFund.innerText = activeFundName + ' · ' + activeAccName;
+        var bannerRate = document.getElementById('live-banner-rate');
+        if (bannerRate) bannerRate.innerText = activeRate + '% Commission';
+        if (liveTxInterval) clearInterval(liveTxInterval);
+        setTimeout(function() { generateNextTransaction(); }, 500);
+        liveTxInterval = setInterval(function() { generateNextTransaction(); }, 3000);
+        saveAppState();
+        updateHomeActiveSection();
+        showToast('Live session started!', 'success');
+    }
+
+    function stopLiveFeed() {
+        if (!liveTxRunning) { showToast('Live feed already stopped', 'info'); return; }
+        liveTxRunning = false;
+        if (liveTxInterval) { clearInterval(liveTxInterval); liveTxInterval = null; }
+        updateLiveStatusUI();
+        updatePauseButtonUI();
+        saveAppState();
+        updateHomeActiveSection();
+        showToast('Live feed stopped', 'info');
+    }
+
+    function toggleLivePause() {
+        if (!accountActive) { showToast('No active session', 'error'); return; }
+        if (liveTxRunning) {
+            stopLiveFeed();
+            showToast('Session paused', 'info');
+        } else {
+            startLiveFeed();
+            showToast('Session resumed', 'success');
+        }
+        updatePauseButtonUI();
+    }
+
+    function updatePauseButtonUI() {
+        var btn = document.getElementById('btn-pause-live');
+        var icon = document.getElementById('pause-icon');
+        var text = document.getElementById('pause-text');
+        if (!btn || !icon || !text) return;
+        if (liveTxRunning) {
+            btn.className = 'bg-neonYellow/20 border border-neonYellow text-neonYellow font-bold py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-neonYellow/30 transition-all';
+            icon.className = 'fa-solid fa-pause';
+            text.innerText = 'PAUSE';
+        } else {
+            btn.className = 'bg-neonGreen/20 border border-neonGreen text-neonGreen font-bold py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-neonGreen/30 transition-all';
+            icon.className = 'fa-solid fa-play';
+            text.innerText = 'RESUME';
+        }
+    }
+
+    function generateNextTransaction() {
+        if (!accountActive) { stopLiveFeed(); return; }
+        liveTxTickCount++;
+        document.getElementById('live-tx-count').innerText = liveTxTickCount;
+        var baseAmt = activeAmount || 5000;
+        var randomAmt = Math.floor((Math.random() * 0.25 + 0.05) * baseAmt);
+        randomAmt = Math.round(randomAmt / 5) * 5;
+        var commAmt = Math.floor((randomAmt * liveTxRate) / 100);
+        var cycle = liveTxTickCount % 6;
+        if (cycle === 1) {
+            addLiveFeedItem('Deposit', randomAmt, liveTxRate, 'Pending');
+            totalCredit += randomAmt; walletBalance += randomAmt; totalCommission += commAmt;
+        } else if (cycle === 2) {
+            addLiveFeedItem('Commission', commAmt, liveTxRate, 'Success');
+            totalCommission += commAmt; walletBalance += commAmt;
+        } else if (cycle === 3) {
+            var wdAmt = Math.floor(randomAmt * 0.6);
+            addLiveFeedItem('Withdrawal', wdAmt, liveTxRate, 'Success');
+            totalDebit += wdAmt; walletBalance = Math.max(0, walletBalance - wdAmt);
+        } else if (cycle === 4) {
+            addLiveFeedItem('Refund', randomAmt, liveTxRate, 'Success');
+            totalCredit += randomAmt; walletBalance += randomAmt; totalCommission += commAmt;
+        } else if (cycle === 5) {
+            addLiveFeedItem('Deposit', randomAmt, liveTxRate, 'Pending');
+            totalCredit += randomAmt; walletBalance += randomAmt; totalCommission += commAmt;
+        } else {
+            addLiveFeedItem('Commission', commAmt, liveTxRate, 'Success');
+            totalCommission += commAmt; walletBalance += commAmt;
+        }
+        updateLiveStats();
+        updateAllStats();
+        saveAppState();
+    }
+
+    function updateLiveStatusUI() {
+        var statusBadge = document.getElementById('live-status-badge');
+        var statusText = document.getElementById('live-status-text');
+        var liveDot = document.getElementById('live-dot');
+        if (!statusBadge || !statusText || !liveDot) return;
+        if (accountActive) {
+            if (liveTxRunning) {
+                statusBadge.className = 'flex items-center gap-2 bg-neonGreen/10 border border-neonGreen rounded-lg px-3 py-1.5';
+                statusText.innerText = 'LIVE';
+                statusText.className = 'text-neonGreen font-bold text-sm';
+                liveDot.className = 'w-2 h-2 rounded-full bg-neonGreen live-dot';
+            } else {
+                statusBadge.className = 'flex items-center gap-2 bg-neonYellow/10 border border-neonYellow rounded-lg px-3 py-1.5';
+                statusText.innerText = 'PAUSED';
+                statusText.className = 'text-neonYellow font-bold text-sm';
+                liveDot.className = 'w-2 h-2 rounded-full bg-neonYellow animate-pulse';
+            }
+        } else {
+            statusBadge.className = 'flex items-center gap-2 bg-gray-800 border border-gray-600 rounded-lg px-3 py-1.5';
+            statusText.innerText = 'INACTIVE';
+            statusText.className = 'text-gray-400 font-bold text-sm';
+            liveDot.className = 'w-2 h-2 rounded-full bg-gray-500';
+        }
+        var banner = document.getElementById('live-session-banner');
+        if (banner) {
+            if (accountActive) {
+                banner.style.display = 'block';
+                var bannerFund = document.getElementById('live-banner-fund');
+                if (bannerFund) bannerFund.innerText = activeFundName + ' · ' + activeAccName;
+                var bannerRate = document.getElementById('live-banner-rate');
+                if (bannerRate) bannerRate.innerText = activeRate + '% Commission';
+            } else {
+                banner.style.display = 'none';
+            }
+        }
+    }
+
+    function updateLiveStats() {
+        var e1 = document.getElementById('live-total-credit');
+        var e2 = document.getElementById('live-total-debit');
+        var e3 = document.getElementById('live-total-commission');
+        if (e1) e1.innerText = '₹' + totalCredit.toLocaleString('en-IN', { maximumFractionDigits: 0 });
+        if (e2) e2.innerText = '₹' + totalDebit.toLocaleString('en-IN', { maximumFractionDigits: 0 });
+        if (e3) e3.innerText = '₹' + totalCommission.toLocaleString('en-IN', { maximumFractionDigits: 0 });
+    }
+
+    function addLiveFeedItem(type, amount, rate, status) {
+        var feed = document.getElementById('live-feed');
+        var empty = document.getElementById('live-feed-empty');
+        if (empty) empty.remove();
+        if (!feed) return;
+        var config = {
+            'Deposit':    { colorClass: 'neonGreen',  borderColor: '#00E676', label: 'Deposit',    labelCn: 'Wallet Credit',     arrowIcon: 'fa-arrow-down',     prefix: '+' },
+            'Commission': { colorClass: 'neonYellow', borderColor: '#FFD700', label: 'Commission', labelCn: 'Earned Commission', arrowIcon: 'fa-arrow-trend-up', prefix: '+' },
+            'Withdrawal': { colorClass: 'neonRed',    borderColor: '#FF3D00', label: 'Withdrawal', labelCn: 'Fee Deducted',      arrowIcon: 'fa-arrow-up',       prefix: '-' },
+            'Refund':     { colorClass: 'neonCyan',   borderColor: '#00E5FF', label: 'Refund',     labelCn: 'Refund Processed',  arrowIcon: 'fa-rotate-left',    prefix: '+' }
+        };
+        var cfg = config[type] || config['Deposit'];
+        var statusClass = status === 'Pending' ? 'neonYellow' : 'neonGreen';
+        var statusIcon = status === 'Pending' ? 'fa-hourglass-half' : 'fa-circle-check';
+        var txnId = 'TXN-' + Math.floor(Math.random() * 9000000000000 + 1000000000000);
+        var commAmt = Math.floor((amount * rate) / 100);
+        var amtDisplay = '₹' + amount.toLocaleString('en-IN', { maximumFractionDigits: 0 });
+        var commDisplay = '₹' + commAmt.toLocaleString('en-IN', { maximumFractionDigits: 0 });
+        var now = new Date();
+        var dd = String(now.getDate()).padStart(2, '0');
+        var mm = String(now.getMonth() + 1).padStart(2, '0');
+        var yyyy = now.getFullYear();
+        var hh = now.getHours();
+        var ampm = hh >= 12 ? 'pm' : 'am';
+        hh = hh % 12; hh = hh ? hh : 12; hh = String(hh).padStart(2, '0');
+        var min = String(now.getMinutes()).padStart(2, '0');
+        var ss = String(now.getSeconds()).padStart(2, '0');
+        var dateTimeStr = dd + '/' + mm + '/' + yyyy + ', ' + hh + ':' + min + ':' + ss + ' ' + ampm;
+        var commissionHTML = (type === 'Deposit' || type === 'Refund') ?
+            '<p class="text-neonYellow text-xs font-bold">Commission: ' + commDisplay + '</p>' :
+            '<p class="text-gray-600 text-[10px]">—</p>';
+        var itemHTML = '<div class="live-tx-item bg-card rounded-2xl p-4 mb-3" style="border-left: 4px solid ' + cfg.borderColor + '; border-top: 1px solid #2a2a2a; border-right: 1px solid #2a2a2a; border-bottom: 1px solid #2a2a2a;">' +
+            '<div class="flex justify-between items-start mb-2">' +
+                '<p class="text-' + cfg.colorClass + ' font-bold text-xl">' + cfg.prefix + amtDisplay + '</p>' +
+                '<span class="bg-' + statusClass + '/20 text-' + statusClass + ' text-[10px] px-3 py-1 rounded-full border border-' + statusClass + ' flex items-center gap-1">' +
+                    '<i class="fa-solid ' + statusIcon + ' text-[9px]"></i> ' + status +
+                '</span>' +
+            '</div>' +
+            '<div class="flex justify-between items-center mb-1">' +
+                '<p class="text-gray-300 text-xs flex items-center gap-1"><i class="fa-solid ' + cfg.arrowIcon + ' text-' + cfg.colorClass + ' text-[10px]"></i> ' + cfg.label + '</p>' +
+                '<p class="text-gray-500 text-[10px]">' + dateTimeStr + '</p>' +
+            '</div>' +
+            '<p class="text-gray-400 text-xs mb-1">' + cfg.labelCn + '</p>' +
+            '<div class="flex justify-between items-center">' +
+                '<p class="text-gray-500 text-[10px] font-mono">' + txnId + '</p>' +
+                commissionHTML +
+            '</div>' +
+        '</div>';
+        feed.insertAdjacentHTML('afterbegin', itemHTML);
+        feed.scrollTop = 0;
+    }
+
+    // ========== STATS ==========
+    function updateAllStats() {
+        var el;
+        el = document.getElementById('home-total-credit'); if (el) el.innerText = '₹' + totalCredit.toLocaleString('en-IN', { maximumFractionDigits: 0 });
+        el = document.getElementById('home-total-debit'); if (el) el.innerText = '₹' + totalDebit.toLocaleString('en-IN', { maximumFractionDigits: 0 });
+        el = document.getElementById('home-total-commission'); if (el) el.innerText = '₹' + totalCommission.toLocaleString('en-IN', { maximumFractionDigits: 0 });
+        el = document.getElementById('profile-total-deposited'); if (el) el.innerText = '₹' + totalDeposited.toLocaleString('en-IN', { maximumFractionDigits: 0 });
+        el = document.getElementById('profile-total-commission'); if (el) el.innerText = '₹' + totalCommission.toLocaleString('en-IN', { maximumFractionDigits: 0 });
+        el = document.getElementById('home-gaming-wallet'); if (el) el.innerText = walletBalance.toLocaleString('en-IN');
+        el = document.getElementById('withdraw-commission'); if (el) el.innerText = '₹' + totalCommission.toLocaleString('en-IN', { maximumFractionDigits: 0 });
+        el = document.getElementById('withdraw-available'); if (el) el.innerText = '₹' + totalCommission.toLocaleString('en-IN', { maximumFractionDigits: 0 });
+        el = document.getElementById('profile-accounts-count'); if (el) el.innerText = bankAccounts.length;
+        el = document.getElementById('profile-tx-count'); if (el) el.innerText = txCount;
+    }
+
+    // ========== TRANSACTIONS ==========
+    function addTransaction(status, amount, type) {
+        transactions.push({ status: status, amount: amount, type: type, time: Date.now() });
+        historyItems = transactions.length;
+        renderTransactions();
+        renderProfileTransactions();
+        updateHistoryCount();
+        applyFilter(currentFilter);
+        saveAppState();
+    }
+
+    function renderTransactions() {
+        var list = document.getElementById('history-list');
+        if (!list) return;
+        list.innerHTML = '';
+        if (transactions.length === 0) {
+            list.innerHTML = '<div class="border-2 border-dashed border-borderDark rounded-2xl p-8 text-center" id="empty-history">' +
+                '<i class="fa-solid fa-receipt text-gray-600 text-4xl mb-3"></i>' +
+                '<p class="font-bold text-white">No transactions yet</p>' +
+                '<p class="text-gray-500 text-xs mt-1">暂无交易记录</p></div>';
+            return;
+        }
+        for (var i = transactions.length - 1; i >= 0; i--) {
+            var t = transactions[i];
+            var sHtml = '', iHtml = '', c = '';
+            if (t.status === 'Rejected') {
+                sHtml = '<p class="text-neonRed text-[10px] flex items-center gap-1 justify-end"><i class="fa-solid fa-circle-exclamation"></i> Rejected</p>';
+                iHtml = '<i class="fa-solid fa-circle-xmark text-neonRed"></i>'; c = 'neonRed';
+            } else if (t.status === 'Processing') {
+                sHtml = '<p class="text-neonYellow text-[10px] flex items-center gap-1 justify-end"><i class="fa-regular fa-clock"></i> Processing</p>';
+                iHtml = '<i class="fa-regular fa-clock text-neonYellow"></i>'; c = 'neonYellow';
+            } else {
+                sHtml = '<p class="text-neonGreen text-[10px] flex items-center gap-1 justify-end"><i class="fa-solid fa-circle-check"></i> Success</p>';
+                iHtml = '<i class="fa-solid fa-arrow-trend-up text-neonGreen"></i>'; c = 'neonGreen';
+            }
+            var f = '₹' + t.amount.toLocaleString('en-IN');
+            var txHTML = '<div class="bg-card border border-borderDark rounded-2xl p-4 flex justify-between items-center mb-3 transaction-item" data-type="' + t.type + '" data-status="' + t.status.toLowerCase() + '">' +
+                '<div class="flex items-center gap-3">' +
+                    '<div class="w-10 h-10 rounded-lg bg-' + c + '/20 flex items-center justify-center">' + iHtml + '</div>' +
+                    '<div><p class="font-bold text-white text-sm">Security Deposit</p><p class="text-gray-500 text-xs">Just now · INR</p></div>' +
+                '</div>' +
+                '<div class="text-right"><p class="text-' + c + ' font-bold text-sm">+' + f + '</p>' + sHtml + '</div>' +
+            '</div>';
+            list.insertAdjacentHTML('beforeend', txHTML);
+        }
+    }
+
+    function renderProfileTransactions() {
+        var list = document.getElementById('profile-tx-list');
+        var empty = document.getElementById('profile-tx-empty');
+        if (!list) return;
+        list.innerHTML = '';
+        if (transactions.length === 0) {
+            if (empty) empty.style.display = 'block';
+            return;
+        }
+        if (empty) empty.style.display = 'none';
+        for (var i = transactions.length - 1; i >= 0; i--) {
+            var t = transactions[i];
+            var f = '₹' + t.amount.toLocaleString('en-IN');
+            var c = t.status === 'Rejected' ? 'neonRed' : (t.status === 'Processing' ? 'neonYellow' : 'neonGreen');
+            var icon = t.type === 'credit' ? 'fa-arrow-trend-up' : 'fa-circle-xmark';
+            var sign = t.type === 'credit' ? '+' : '-';
+            var itemHTML = '<div class="flex justify-between items-center py-2 border-b border-borderDark last:border-0">' +
+                '<div class="flex items-center gap-2">' +
+                    '<div class="w-8 h-8 rounded-lg bg-' + c + '/20 flex items-center justify-center">' +
+                        '<i class="fa-solid ' + icon + ' text-' + c + ' text-xs"></i>' +
+                    '</div>' +
+                    '<div><p class="text-white text-xs font-bold">Security Deposit</p><p class="text-gray-500 text-[10px]">Just now</p></div>' +
+                '</div>' +
+                '<p class="text-' + c + ' font-bold text-xs">' + sign + f + '</p>' +
+            '</div>';
+            list.insertAdjacentHTML('beforeend', itemHTML);
+        }
+    }
+
+    function updateHistoryCount() {
+        var el = document.getElementById('history-count');
+        if (el) el.innerText = historyItems + ' total — All time';
+    }
+    function filterHistory(filterType, btn) {
+        currentFilter = filterType;
+        document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        applyFilter(filterType);
+    }
+    function applyFilter(filterType) {
+        var items = document.querySelectorAll('.transaction-item');
+        var noResult = document.getElementById('no-filter-result');
+        var count = 0;
+        items.forEach(function(item) {
+            var type = item.getAttribute('data-type');
+            var status = item.getAttribute('data-status');
+            var show = false;
+            if (filterType === 'all') show = true;
+            else if (filterType === 'credit') show = (type === 'credit');
+            else if (filterType === 'debit') show = (type === 'debit');
+            else if (filterType === 'pending') show = (status === 'processing');
+            item.style.display = show ? 'flex' : 'none';
+            if (show) count++;
+        });
+        if (noResult) {
+            if (items.length > 0 && count === 0) noResult.classList.remove('hidden');
+            else noResult.classList.add('hidden');
+        }
+    }
+
+    // ========== ACTIVE ACCOUNTS (HOME) ==========
+    function updateHomeActiveSection() {
+        renderActiveAccounts();
+    }
+
+    function renderActiveAccounts() {
+        var section = document.getElementById('home-active-accounts-section');
+        var list = document.getElementById('home-active-accounts-list');
+        if (!section || !list) return;
+        if (bankAccounts.length === 0) {
+            section.style.display = 'none';
+            return;
+        }
+        section.style.display = 'block';
+        list.innerHTML = '';
+        for (var i = 0; i < bankAccounts.length; i++) {
+            (function(idx) {
+                var acc = bankAccounts[idx];
+                var isActive = accountActive && activeFundType === acc.fundType && activeAccName === acc.accName;
+                var statusColor = isActive ? (liveTxRunning ? 'neonGreen' : 'neonYellow') : 'gray';
+                var statusText = isActive ? (liveTxRunning ? 'LIVE' : 'PAUSED') : 'STOPPED';
+                var fundIcon = acc.fundType === 'gaming' ? 'fa-gamepad' : 'fa-chart-line';
+                var colorClass = acc.fundType === 'gaming' ? 'neonGreen' : 'neonCyan';
+                
+                var html = '<div class="bg-card border border-borderDark rounded-2xl p-4 mb-3">' +
+                    '<div class="flex justify-between items-start mb-3">' +
+                        '<div class="flex items-center gap-3">' +
+                            '<div class="w-10 h-10 rounded-lg bg-' + colorClass + '/10 flex items-center justify-center">' +
+                                '<i class="fa-solid ' + fundIcon + ' text-' + colorClass + '"></i>' +
+                            '</div>' +
+                            '<div>' +
+                                '<p class="font-bold text-sm text-white">' + acc.fundName + ' — ' + acc.accName + '</p>' +
+                                '<p class="text-gray-500 text-xs">₹' + acc.amount.toLocaleString('en-IN') + ' · ' + acc.rate + '% Commission</p>' +
+                            '</div>' +
+                        '</div>' +
+                        '<span class="bg-' + statusColor + '/20 text-' + statusColor + ' text-[10px] px-2 py-1 rounded-full border border-' + statusColor + '">' + statusText + '</span>' +
+                    '</div>' +
+                    '<div class="grid grid-cols-2 gap-2 mb-3 text-xs">' +
+                        '<div class="bg-dark/50 rounded-lg p-2">' +
+                            '<p class="text-gray-500 text-[10px]">Transactions</p>' +
+                            '<p class="text-white font-bold">' + (isActive ? liveTxTickCount : 0) + '</p>' +
+                        '</div>' +
+                        '<div class="bg-dark/50 rounded-lg p-2">' +
+                            '<p class="text-gray-500 text-[10px]">Commission</p>' +
+                            '<p class="text-neonGreen font-bold">₹' + (isActive ? Math.floor(totalCommission) : 0) + '</p>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="grid grid-cols-2 gap-2">' +
+                        '<button onclick="toggleAccountPause(' + idx + ')" class="bg-neonYellow/10 border border-neonYellow text-neonYellow text-xs font-bold py-2 rounded-lg">' +
+                            '<i class="fa-solid ' + (isActive && liveTxRunning ? 'fa-pause' : 'fa-play') + '"></i> ' + (isActive && liveTxRunning ? 'PAUSE' : 'RESUME') +
+                        '</button>' +
+                        '<button onclick="removeAccount(' + idx + ')" class="bg-neonRed/10 border border-neonRed text-neonRed text-xs font-bold py-2 rounded-lg">' +
+                            '<i class="fa-solid fa-trash"></i> REMOVE' +
+                        '</button>' +
+                    '</div>' +
+                '</div>';
+                list.insertAdjacentHTML('beforeend', html);
+            })(i);
+        }
+    }
+
+    function toggleAccountPause(index) {
+        var acc = bankAccounts[index];
+        if (!acc) return;
+        if (accountActive && activeFundType === acc.fundType && activeAccName === acc.accName) {
+            if (liveTxRunning) {
+                stopLiveFeed();
+            } else {
+                startLiveFeed();
+            }
+        } else {
+            accountActive = true;
+            activeFundType = acc.fundType;
+            activeFundName = acc.fundName;
+            activeAccName = acc.accName;
+            activeAmount = acc.amount;
+            activeRate = acc.rate;
+            liveTxRate = acc.rate;
+            sessionStartTime = Date.now();
+            saveAppState();
+            updateLiveStatusUI();
+            updatePauseButtonUI();
+            startLiveFeed();
+        }
+        renderActiveAccounts();
+        updatePauseButtonUI();
+    }
+
+    function removeAccount(index) {
+        if (!confirm('Are you sure you want to remove this account?')) return;
+        var acc = bankAccounts[index];
+        if (accountActive && activeFundType === acc.fundType && activeAccName === acc.accName) {
+            stopLiveFeed();
+            accountActive = false;
+            liveTxRunning = false;
+            if (liveSessionTimeout) { clearTimeout(liveSessionTimeout); liveSessionTimeout = null; }
+        }
+        bankAccounts.splice(index, 1);
+        saveAppState();
+        renderActiveAccounts();
+        updateAllStats();
+        updateLiveStatusUI();
+        updatePauseButtonUI();
+        showToast('Account removed successfully', 'success');
+    }
+
+    // ========== ADD ACCOUNT ==========
+    function selectFund(type) {
+        selectedFund = type;
+        var gaming = document.getElementById('fund-gaming');
+        var stock = document.getElementById('fund-stock');
+        if (type === 'gaming') {
+            gaming.classList.add('border-neonGreen');
+            gaming.classList.remove('border-borderDark', 'opacity-60');
+            stock.classList.remove('border-neonCyan');
+            stock.classList.add('border-borderDark', 'opacity-60');
+        } else {
+            stock.classList.add('border-neonCyan');
+            stock.classList.remove('border-borderDark', 'opacity-60');
+            gaming.classList.remove('border-neonGreen');
+            gaming.classList.add('border-borderDark', 'opacity-60');
+        }
+        updateAccountAmounts(type);
+    }
+    function updateAccountAmounts(fundType) {
+        var savingAmount = 5000, currentAmount = 10000, corporateAmount = 15000;
+        if (fundType === 'stock') { savingAmount = 10000; currentAmount = 20000; corporateAmount = 30000; }
+        var savingEl = document.getElementById('acc-saving');
+        if (savingEl) {
+            var pEl = savingEl.querySelector('.acc-price');
+            if (pEl) pEl.innerText = '₹' + savingAmount.toLocaleString('en-IN');
+            savingEl.setAttribute('onclick', "selectAccType('saving', " + savingAmount + ", 'Saving Account')");
+        }
+        var currentEl = document.getElementById('acc-current');
+        if (currentEl) {
+            var pEl2 = currentEl.querySelector('.acc-price');
+            if (pEl2) pEl2.innerText = '₹' + currentAmount.toLocaleString('en-IN');
+            currentEl.setAttribute('onclick', "selectAccType('current', " + currentAmount + ", 'Current Account')");
+        }
+        var corporateEl = document.getElementById('acc-corporate');
+        if (corporateEl) {
+            var pEl3 = corporateEl.querySelector('.acc-price');
+            if (pEl3) pEl3.innerText = '₹' + corporateAmount.toLocaleString('en-IN');
+            corporateEl.setAttribute('onclick', "selectAccType('corporate', " + corporateAmount + ", 'Corporate Account')");
+        }
+        selectAccType('saving', savingAmount, 'Saving Account');
+    }
+    function selectAccType(type, amount, name) {
+        selectedAccType = type;
+        selectedAmount = amount;
+        selectedAccName = name;
+        selectedCommissionRate = selectedFund === 'gaming' ? 5 : 10;
+        ['saving', 'current', 'corporate'].forEach(function(t) {
+            var el = document.getElementById('acc-' + t);
+            el.classList.remove('border-neonYellow');
+            el.classList.add('border-borderDark', 'opacity-60');
+        });
+        var sel = document.getElementById('acc-' + type);
+        sel.classList.add('border-neonYellow');
+        sel.classList.remove('border-borderDark', 'opacity-60');
+        document.getElementById('deposit-required').innerText = amount.toLocaleString('en-IN');
+    }
+    function submitAccountDetails() {
+        var holder = document.getElementById('acc-holder').value.trim();
+        var bank = document.getElementById('acc-bank').value.trim();
+        var number = document.getElementById('acc-number').value.trim();
+        var ifsc = document.getElementById('acc-ifsc').value.trim();
+        var mobile = document.getElementById('acc-mobile').value.trim();
+        var email = document.getElementById('acc-email').value.trim();
+        if (!holder || !bank || !number || !ifsc || !mobile || !email) {
+            showToast('Please fill all bank details', 'error'); return;
+        }
+        if (!isValidMobile(mobile)) { showToast('Mobile must be 10 digits', 'error'); return; }
+        if (!isValidEmail(email)) { showToast('Invalid email address', 'error'); return; }
+        var fundName = selectedFund === 'gaming' ? 'Gaming Fund' : 'Stock Fund';
+        document.getElementById('summary-fund').innerText = fundName;
+        document.getElementById('summary-acc').innerText = selectedAccName;
+        document.getElementById('summary-amount').innerText = selectedAmount.toLocaleString('en-IN');
+        document.getElementById('summary-amount-2').innerText = selectedAmount.toLocaleString('en-IN');
+        var btn = document.getElementById('acc-payment-btn');
+        btn.disabled = true;
+        btn.classList.add('bg-card', 'border-borderDark', 'text-gray-500', 'cursor-not-allowed');
+        btn.classList.remove('bg-neonYellow', 'text-black', 'glow-yellow');
+        btn.innerHTML = 'ENTER UTR TO CONTINUE <br><span class="text-xs font-normal">输入 UTR 以继续</span>';
+        document.getElementById('acc-payment-utr').value = '';
+        document.getElementById('acc-payment-utr').classList.remove('error', 'success');
+        showToast('Details submitted! Proceed to payment', 'success');
+        setTimeout(function() { showPage('page-acc-payment'); }, 600);
+    }
+    function checkAccPaymentUTR() {
+        var utr = document.getElementById('acc-payment-utr').value.trim();
+        var btn = document.getElementById('acc-payment-btn');
+        var input = document.getElementById('acc-payment-utr');
+        if (utr === SECRET_UTR) {
+            btn.disabled = false;
+            btn.classList.remove('bg-card', 'border-borderDark', 'text-gray-500', 'cursor-not-allowed');
+            btn.classList.add('bg-neonYellow', 'text-black', 'glow-yellow');
+            btn.innerHTML = 'SUBMIT PAYMENT <br><span class="text-xs font-normal">提交付款</span>';
+            input.classList.remove('error'); input.classList.add('success');
+        } else {
+            btn.disabled = true;
+            btn.classList.add('bg-card', 'border-borderDark', 'text-gray-500', 'cursor-not-allowed');
+            btn.classList.remove('bg-neonYellow', 'text-black', 'glow-yellow');
+            btn.innerHTML = 'ENTER UTR TO CONTINUE <br><span class="text-xs font-normal">输入 UTR 以继续</span>';
+            input.classList.remove('success');
+            if (utr.length > 0) input.classList.add('error');
+        }
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        var utrInput = document.getElementById('acc-payment-utr');
+        if (utrInput) utrInput.addEventListener('input', checkAccPaymentUTR);
+    });
+
+    function submitAccPayment() {
+        var utr = document.getElementById('acc-payment-utr').value.trim();
+        if (utr !== SECRET_UTR) {
+            showToast('UTR not matched', 'error');
+            document.getElementById('acc-payment-utr').classList.add('error');
+            return;
+        }
+        txCount++;
+        document.getElementById('profile-tx-count').innerText = txCount;
+        var commission = (selectedAmount * selectedCommissionRate) / 100;
+        totalDeposited += selectedAmount;
+        totalCommission += commission;
+        totalCredit += selectedAmount;
+        walletBalance += selectedAmount;
+        updateAllStats();
+        addTransaction('Success', selectedAmount, 'credit');
+        var fundName = selectedFund === 'gaming' ? 'Gaming Fund' : 'Stock Fund';
+        var newAcc = {
+            fundName: fundName, fundType: selectedFund,
+            accName: selectedAccName, accType: selectedAccType,
+            amount: selectedAmount, rate: selectedCommissionRate
+        };
+        bankAccounts.push(newAcc);
+        saveAppState();
+        activateAccount(selectedFund, fundName, selectedAccName, selectedAmount, selectedCommissionRate);
+        updateAllStats();
+        renderActiveAccounts();
+        showToast('Account activated!', 'success');
+        setTimeout(function() { showPage('page-home'); }, 800);
+    }
+    function cancelAccPayment() {
+        if (currentTimerInterval) { clearInterval(currentTimerInterval); currentTimerInterval = null; }
+        showPage('page-add-acc');
+    }
+
+    // ========== WITHDRAW ==========
+    function switchWithdrawTab(tab, btn) {
+        var tabWithdraw = document.getElementById('wtab-withdraw');
+        var tabHistory = document.getElementById('wtab-history');
+        var contentWithdraw = document.getElementById('withdraw-tab-content');
+        var contentHistory = document.getElementById('withdraw-history-content');
+        if (tab === 'withdraw') {
+            tabWithdraw.classList.add('bg-neonCyan', 'text-black', 'glow-cyan');
+            tabWithdraw.classList.remove('text-gray-400');
+            tabHistory.classList.remove('bg-neonCyan', 'text-black', 'glow-cyan');
+            tabHistory.classList.add('text-gray-400');
+            contentWithdraw.style.display = 'block';
+            contentHistory.style.display = 'none';
+        } else {
+            tabHistory.classList.add('bg-neonCyan', 'text-black', 'glow-cyan');
+            tabHistory.classList.remove('text-gray-400');
+            tabWithdraw.classList.remove('bg-neonCyan', 'text-black', 'glow-cyan');
+            tabWithdraw.classList.add('text-gray-400');
+            contentWithdraw.style.display = 'none';
+            contentHistory.style.display = 'block';
+            renderWithdrawHistory();
+        }
+    }
+    function addWithdrawHistoryItem(amount) {
+        var now = new Date();
+        var dd = String(now.getDate()).padStart(2, '0');
+        var mm = String(now.getMonth() + 1).padStart(2, '0');
+        var yyyy = now.getFullYear();
+        var hh = String(now.getHours()).padStart(2, '0');
+        var min = String(now.getMinutes()).padStart(2, '0');
+        var dateStr = dd + '/' + mm + '/' + yyyy + ', ' + hh + ':' + min;
+        withdrawHistory.push({ amount: amount, dateStr: dateStr, txnId: 'WD-' + Math.floor(Math.random() * 9000000000 + 1000000000) });
+        renderWithdrawHistory();
+        saveAppState();
+    }
+    function renderWithdrawHistory() {
+        var list = document.getElementById('withdraw-history-list');
+        if (!list) return;
+        list.innerHTML = '';
+        if (withdrawHistory.length === 0) {
+            list.innerHTML = '<div class="border-2 border-dashed border-borderDark rounded-2xl p-8 text-center" id="withdraw-history-empty">' +
+                '<i class="fa-solid fa-money-bill-transfer text-gray-600 text-4xl mb-3"></i>' +
+                '<p class="font-bold text-white">No withdrawal yet</p>' +
+                '<p class="text-gray-500 text-xs mt-1">暂无提现记录</p></div>';
+            return;
+        }
+        for (var i = withdrawHistory.length - 1; i >= 0; i--) {
+            var w = withdrawHistory[i];
+            var itemHTML = '<div class="bg-card border border-borderDark rounded-2xl p-4 mb-3" style="border-left: 4px solid #00E676;">' +
+                '<div class="flex justify-between items-start mb-2">' +
+                    '<p class="text-neonGreen font-bold text-xl">-₹' + w.amount.toLocaleString('en-IN') + '</p>' +
+                    '<span class="bg-neonGreen/20 text-neonGreen text-[10px] px-3 py-1 rounded-full border border-neonGreen flex items-center gap-1">' +
+                        '<i class="fa-solid fa-circle-check text-[9px]"></i> Success</span>' +
+                '</div>' +
+                '<div class="flex justify-between items-center mb-1">' +
+                    '<p class="text-gray-300 text-xs flex items-center gap-1"><i class="fa-solid fa-arrow-up text-neonGreen text-[10px]"></i> Withdrawal</p>' +
+                    '<p class="text-gray-500 text-[10px]">' + w.dateStr + '</p>' +
+                '</div>' +
+                '<p class="text-gray-400 text-xs mb-1">Withdrawal Successful</p>' +
+                '<p class="text-gray-500 text-[10px] font-mono">' + w.txnId + '</p>' +
+            '</div>';
+            list.insertAdjacentHTML('beforeend', itemHTML);
+        }
+    }
+    function selectPayoutMethod(method) {
+        selectedPayout = method;
+        ['upi', 'bank', 'usdt'].forEach(function(m) {
+            var el = document.getElementById('payout-' + m);
+            el.classList.remove('active', 'border-neonYellow');
+            el.classList.add('border-borderDark', 'opacity-70');
+        });
+        var sel = document.getElementById('payout-' + method);
+        sel.classList.add('active', 'border-neonYellow');
+        sel.classList.remove('border-borderDark', 'opacity-70');
+        var upiInput = document.getElementById('withdraw-upi');
+        if (method === 'upi') upiInput.placeholder = 'yourname@upi';
+        else if (method === 'bank') upiInput.placeholder = 'Account number';
+        else upiInput.placeholder = 'TRC20 wallet address';
+    }
+    function submitWithdrawal() {
+        var upi = document.getElementById('withdraw-upi').value.trim();
+        var amount = document.getElementById('withdraw-amount').value.trim();
+        var pwd = document.getElementById('withdraw-password').value.trim();
+        if (!upi) { showToast('Please enter UPI ID', 'error'); return; }
+        if (!amount) { showToast('Please enter amount', 'error'); return; }
+        if (parseInt(amount) < 5000) { showToast('Minimum withdrawal is ₹5,000', 'error'); return; }
+        if (parseInt(amount) > totalCommission) {
+            showToast('Insufficient commission! Available: ₹' + totalCommission.toLocaleString('en-IN'), 'error');
+            return;
+        }
+        if (!pwd) { showToast('Please enter transaction password', 'error'); return; }
+        totalCommission -= parseInt(amount);
+        totalDebit += parseInt(amount);
+        updateAllStats();
+        addTransaction('Success', parseInt(amount), 'debit');
+        addWithdrawHistoryItem(parseInt(amount));
+        saveAppState();
+        showToast('Withdrawal of ₹' + parseInt(amount).toLocaleString('en-IN') + ' Successful!', 'success');
+        document.getElementById('withdraw-upi').value = '';
+        document.getElementById('withdraw-amount').value = '';
+        document.getElementById('withdraw-password').value = '';
+    }
+    function copyUPI() {
+        var upi = "Deewuuu01@ptyes";
+        var ta = document.createElement("textarea");
+        ta.value = upi;
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand("copy"); } catch(e) {}
+        document.body.removeChild(ta);
+        showToast('UPI ID Copied!', 'success');
+    }
+
+    setInterval(function() {
+        var clock = document.getElementById('live-clock');
+        if (clock) {
+            var now = new Date();
+            clock.innerText = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0') + ':' + String(now.getSeconds()).padStart(2, '0');
+        }
+    }, 1000);
+
+    // ========== INIT ==========
+    function initApp() {
+        var storedUser = getUserData();
+        var loggedIn = isUserLoggedIn();
+        if (storedUser && loggedIn) {
+            loadAppState();
+            loadProfilePhoto();
+            applyUserToUI(storedUser);
+            updateAllStats();
+            renderTransactions();
+            renderProfileTransactions();
+            renderActiveAccounts();
+            renderWithdrawHistory();
+            updateHistoryCount();
+            document.getElementById('profile-tx-count').innerText = txCount;
+            document.getElementById('profile-accounts-count').innerText = bankAccounts.length;
+            var rateEl = document.getElementById('withdraw-commission-rate');
+            if (rateEl) rateEl.innerText = (liveTxRate || 5) + '% Commission';
+            var commRateEl = document.getElementById('live-commission-rate');
+            if (commRateEl) commRateEl.innerText = '@' + (liveTxRate || 5) + '%';
+            var liveCountEl = document.getElementById('live-tx-count');
+            if (liveCountEl) liveCountEl.innerText = liveTxTickCount;
+            showPage('page-home');
+            if (accountActive) {
+                updateLiveStatusUI();
+                updatePauseButtonUI();
+                if (liveTxRunning) {
+                    startLiveFeed();
+                } else {
+                    var elapsed = Date.now() - sessionStartTime;
+                    var remaining = LIVE_SESSION_WAIT_MS - elapsed;
+                    if (remaining > 0) {
+                        if (liveSessionTimeout) clearTimeout(liveSessionTimeout);
+                        liveSessionTimeout = setTimeout(function() {
+                            startLiveFeed();
+                            liveSessionTimeout = null;
+                        }, remaining);
+                    } else {
+                        startLiveFeed();
+                    }
+                }
+            }
+        } else if (storedUser) {
+            applyUserToUI(storedUser);
+            showPage('page-auth');
+            toggleAuth('signin');
+        } else {
+            showPage('page-auth');
+            toggleAuth('register');
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initApp);
+    } else {
+        initApp();
+    }
+</script>
+
+</body>
+</html>
